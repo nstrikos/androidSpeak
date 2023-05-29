@@ -8,6 +8,7 @@
 #include "hotKeyThread.h"
 #include "shortcutWidget.h"
 #include "optionsDialog.h"
+#include "fontsettingsdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -48,6 +49,7 @@ private slots:
     void showShortcutDialog();
     void showOptionsDialog();
     void updateKeys(QVector<HotKey*>hotkeys);
+    void showFontSettingsDialog();
 
 private:
     Ui::MainWindow *ui;
@@ -85,6 +87,14 @@ private:
 
     bool m_closeOnSystemTray;
     bool m_startMinimized;
+
+    FontSettingsDialog *fontSettingsDialog;
+    QFont appFont;
+    QString appFontFamily;
+    int appFontSize;
+    bool bold;
+
+    QAction *showFontSettingsDialogAction;
 };
 
 #endif // MAINWINDOW_H

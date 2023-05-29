@@ -11,6 +11,7 @@ HEADERS       = chatdialog.h \
                 client.h \
                 clientsocket.h \
                 connection.h \
+                fontsettingsdialog.h \
                 hotKey.h \
                 hotKeyThread.h \
                 mainwindow.h \
@@ -26,6 +27,7 @@ SOURCES       = chatdialog.cpp \
                 client.cpp \
                 clientsocket.cpp \
                 connection.cpp \
+                fontsettingsdialog.cpp \
                 hotKey.cpp \
                 hotKeyThread.cpp \
                 main.cpp \
@@ -39,6 +41,7 @@ SOURCES       = chatdialog.cpp \
                 shortcutWidget.cpp \
                 tripserver.cpp
 FORMS         = chatdialog.ui \
+    fontsettingsdialog.ui \
     mainwindow.ui \
     optionsDialog.ui \
     shortcutWidget.ui

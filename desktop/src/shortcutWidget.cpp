@@ -25,8 +25,8 @@ ShortcutWidget::ShortcutWidget(QWidget *parent) :
         innerLayouts.append(innerLayout);        
 
         QLabel* label = new QLabel(QString("Phrase %1").arg(i+1));
-        labels.append(label);
         innerLayout->addWidget(label);
+        labels.append(label);
 
         QLineEdit *lineEdit = new QLineEdit();        
         innerLayout->addWidget(lineEdit);

@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QDebug>
+#include <QFontDatabase>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     shortcutWindow->setKeys(&hotKeys);
 
     optionsDialog = nullptr;
+    fontSettingsDialog = nullptr;
 }
 
 void MainWindow::init()
@@ -91,8 +93,12 @@ MainWindow::~MainWindow()
     if (optionsDialog != nullptr)
         delete optionsDialog;
 
+    if (fontSettingsDialog != nullptr)
+        delete fontSettingsDialog;
+
     delete optionsDialogAction;
     delete showShortcutAction;
+    delete showFontSettingsDialogAction;
 
     hotKeyThread->terminate();
     hotKeyThread->wait();
@@ -260,14 +266,18 @@ void MainWindow::createMenu()
 {
     showShortcutAction = new QAction(tr("Edit shortcuts..."), this);
     optionsDialogAction = new QAction(tr("Application options..."), this);
+    showFontSettingsDialogAction = new QAction(tr("Font settings..."), this);
+    showFontSettingsDialogAction->setShortcut(tr("Ctrl+F"));
 
 
     connect(showShortcutAction, &QAction::triggered, this, &MainWindow::showShortcutDialog);
     connect(optionsDialogAction, &QAction::triggered, this, &MainWindow::showOptionsDialog);
+    connect(showFontSettingsDialogAction, SIGNAL(triggered()), this, SLOT(showFontSettingsDialog()));
 
     fileMenu = menuBar()->addMenu(tr("Options"));
     fileMenu->addAction(showShortcutAction);
     fileMenu->addAction(optionsDialogAction);
+    fileMenu->addAction(showFontSettingsDialogAction);
 }
 
 void MainWindow::readSettings()
@@ -280,6 +290,9 @@ void MainWindow::readSettings()
     alts = settings.value("alts").toStringList();
     m_closeOnSystemTray = settings.value("systemTray", false).toBool();
     m_startMinimized = settings.value("minimized", false).toBool();
+    appFontFamily = settings.value("fontFamily").toString();
+    appFontSize = settings.value("fontSize", 12).toInt();
+    bold = settings.value("bold", false).toBool();
 
     int x = settings.value("x", 0).toInt();
     int y = settings.value("y", 0).toInt();
@@ -300,6 +313,20 @@ void MainWindow::readSettings()
     QList<int> sizes2;
     sizes2 << size2_1 << size2_2;
     ui->splitter_2->setSizes(sizes2);
+
+    appFont.setFamily(appFontFamily);
+    appFont.setPointSize(appFontSize);
+    appFont.setBold(bold);
+
+    if (appFontFamily == "") {
+        int id = QFontDatabase::addApplicationFont("/usr/share/androidSpeak/LiberationSans-Regular.ttf");
+        QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+        QFont monospace(family);
+        monospace.setPointSize(12);
+        QApplication::setFont(monospace);
+    } else {
+        QApplication::setFont(appFont);
+    }
 
     HotKey tempKey;
 
@@ -370,6 +397,31 @@ void MainWindow::writeSettings()
     settings.setValue("splitter2-size2", ui->splitter_2->sizes().at(1));
     settings.setValue("systemTray", m_closeOnSystemTray);
     settings.setValue("minimized", m_startMinimized);
+    settings.setValue("fontFamily", appFont.family());
+    settings.setValue("fontSize", appFont.pointSize());
+    settings.setValue("bold", bold);
+}
+
+void MainWindow::showFontSettingsDialog()
+{
+    if (fontSettingsDialog == NULL)
+    {
+        fontSettingsDialog = new FontSettingsDialog();
+    }
+    fontSettingsDialog->setModal(true);
+    fontSettingsDialog->setFont(appFont);
+    fontSettingsDialog->setPointSize(appFontSize);
+    fontSettingsDialog->setBold(bold);
+
+    if (fontSettingsDialog->exec())
+    {
+        appFont = fontSettingsDialog->getFont();
+        appFontSize = fontSettingsDialog->getPointSize();
+        bold = fontSettingsDialog->getBold();
+        appFont.setPointSize(appFontSize);
+        appFont.setBold(bold);
+        QApplication::setFont(appFont);
+    }
 }
 
 void MainWindow::activate()
