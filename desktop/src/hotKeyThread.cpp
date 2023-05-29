@@ -1,14 +1,10 @@
 #include "hotKeyThread.h"
 
-#include <QDebug>
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
 HotKeyThread::HotKeyThread()
 {
-    qDebug() << "Registering hot keys...";
-
     Display *dpy = XOpenDisplay(0);
     Window root = DefaultRootWindow(dpy);
 
@@ -18,7 +14,6 @@ HotKeyThread::HotKeyThread()
 void HotKeyThread::setStopped(bool stopped)
 {
     this->stopped = stopped;
-    qDebug() << stopped;
 }
 
 void HotKeyThread::setKeys(QVector<HotKey> keys)
@@ -84,9 +79,6 @@ void HotKeyThread::run()
                 for (int i = 0; i < hotKeys.size(); i++) {
                     if ( (key == hotKeys.at(i).keychar || key == hotKeys.at(i).keychar2) &&
                         ev.xkey.state & hotKeys.at(i).modifiers) {
-                        if (i == 0)
-                            emit selectedText();
-                        else
                             emit sendText(hotKeys.at(i).phrase);
                     }
                 }

@@ -15,7 +15,6 @@ public:
 
 signals:
     void sendText(QString text);
-    void selectedText();
 
 protected:
     void run();

@@ -5,7 +5,6 @@
 #include <QAction>
 #include <QSystemTrayIcon>
 #include <QMenu>
-#include <QClipboard>
 #include "hotKeyThread.h"
 #include "shortcutWidget.h"
 #include "optionsDialog.h"
@@ -49,7 +48,6 @@ private slots:
     void showShortcutDialog();
     void showOptionsDialog();
     void updateKeys(QVector<HotKey*>hotkeys);
-    void selectedText();
 
 private:
     Ui::MainWindow *ui;
@@ -87,8 +85,6 @@ private:
 
     bool m_closeOnSystemTray;
     bool m_startMinimized;
-
-    QClipboard *clipboard;
 };
 
 #endif // MAINWINDOW_H

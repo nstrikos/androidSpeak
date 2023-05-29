@@ -22,21 +22,13 @@ ShortcutWidget::ShortcutWidget(QWidget *parent) :
     for (int i = 0; i < 100; i++)
     {
         QHBoxLayout* innerLayout = new QHBoxLayout;
-        innerLayouts.append(innerLayout);
+        innerLayouts.append(innerLayout);        
 
-        if (i == 0) {
-            QLabel* label = new QLabel(QString("Highlight"));
-            labels.append(label);
-            innerLayout->addWidget(label);
-        } else {
-            QLabel* label = new QLabel(QString("Phrase %1").arg(i+1));
-            labels.append(label);
-            innerLayout->addWidget(label);
-        }
+        QLabel* label = new QLabel(QString("Phrase %1").arg(i+1));
+        labels.append(label);
+        innerLayout->addWidget(label);
 
-        QLineEdit *lineEdit = new QLineEdit();
-        if (i == 0) lineEdit->setReadOnly(true);
-
+        QLineEdit *lineEdit = new QLineEdit();        
         innerLayout->addWidget(lineEdit);
         lineEdits.append(lineEdit);
 

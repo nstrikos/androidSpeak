@@ -39,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     hotKeyThread = new HotKeyThread();
     connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
-    connect(hotKeyThread, &HotKeyThread::selectedText, this, &MainWindow::selectedText);
 
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MainWindow::listWidgetClicked);
 
@@ -63,8 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
     shortcutWindow->setKeys(&hotKeys);
 
     optionsDialog = nullptr;
-
-    clipboard = QApplication::clipboard();
 }
 
 void MainWindow::init()
@@ -236,13 +233,6 @@ void MainWindow::updateKeys(QVector<HotKey *>hotkeys)
     hotKeyThread->start();
 }
 
-void MainWindow::selectedText()
-{
-    ui->textEdit->setText(clipboard->text(QClipboard::Selection));
-    activate();
-
-}
-
 void MainWindow::checkButton()
 {
     if (!connected)
@@ -283,7 +273,7 @@ void MainWindow::createMenu()
 void MainWindow::readSettings()
 {
     hotKeys.clear();
-    QSettings settings("omilo-android", "omilo-android");
+    QSettings settings("androidSpeak", "androidSpeak");
     phrases = settings.value("phrases").toStringList();
     codes = settings.value("codes").toStringList();
     ctrls = settings.value("ctrls").toStringList();
@@ -364,7 +354,7 @@ void MainWindow::writeSettings()
             alts.append("true");
     }
 
-    QSettings settings("omilo-android", "omilo-android");
+    QSettings settings("androidSpeak", "androidSpeak");
 
     settings.setValue("phrases", phrases);
     settings.setValue("codes", codes);
