@@ -319,11 +319,13 @@ void MainWindow::readSettings()
     appFont.setBold(bold);
 
     if (appFontFamily == "") {
-        int id = QFontDatabase::addApplicationFont("/usr/share/androidSpeak/LiberationSans-Regular.ttf");
-        QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-        QFont monospace(family);
-        monospace.setPointSize(12);
-        QApplication::setFont(monospace);
+        if (QFile::exists("/usr/share/androidSpeak/LiberationSans-Regular.ttf")) {
+            int id = QFontDatabase::addApplicationFont("/usr/share/androidSpeak/LiberationSans-Regular.ttf");
+            QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+            QFont monospace(family);
+            monospace.setPointSize(12);
+            QApplication::setFont(monospace);
+        }
     } else {
         QApplication::setFont(appFont);
     }
