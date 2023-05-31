@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->historyEdit, &QTextEdit::textChanged, this, &MainWindow::historyEditChanged);
     connect(ui->textEdit, &QTextEdit::textChanged, this, &MainWindow::textEditChanged);
     connect(ui->talkButton, &QPushButton::clicked, this, &MainWindow::talkButtonClicked);
+    connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::stopButtonClicked);
     connect(ui->clearButton, &QPushButton::clicked, this, &MainWindow::clearButtonClicked);
 
     trayIcon = new QSystemTrayIcon(this);
@@ -168,6 +169,11 @@ void MainWindow::historyEditChanged()
 void MainWindow::talkButtonClicked()
 {
     activate();
+}
+
+void MainWindow::stopButtonClicked()
+{
+    emit sendText("command-stop");
 }
 
 void MainWindow::clearButtonClicked()
@@ -432,7 +438,8 @@ void MainWindow::activate()
         return;
 
     QString text = ui->textEdit->document()->toPlainText();
-    emit sendText(text);    
+    QString textToSend = "command-text:" + text;
+    emit sendText(textToSend);
     ui->textEdit->clear();
     ui->talkButton->setEnabled(false);
 

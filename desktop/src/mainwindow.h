@@ -41,6 +41,7 @@ signals:
 private slots:
     void historyEditChanged();
     void talkButtonClicked();
+    void stopButtonClicked();
     void clearButtonClicked();
     void textEditChanged();
     void showWindow();
