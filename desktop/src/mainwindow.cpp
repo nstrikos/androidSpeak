@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     hotKeyThread = new HotKeyThread();
     connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
+    connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
 
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MainWindow::listWidgetClicked);
 
@@ -65,6 +66,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     optionsDialog = nullptr;
     fontSettingsDialog = nullptr;
+
+    clipboard = QApplication::clipboard();
+    connect(clipboard, &QClipboard::changed, this, &MainWindow::speakClipboard);
+    m_useClipboard = false;
 }
 
 void MainWindow::init()
@@ -143,6 +148,35 @@ void MainWindow::receiveShortCut(QString text)
     activate();
 }
 
+void MainWindow::clipboardEnabled()
+{
+    QString text = clipboard->text(QClipboard::Selection);
+
+    qDebug() << text;
+
+    if (!connected)
+        return;
+
+    ui->textEdit->setText(text);
+    activate();
+}
+
+void MainWindow::speakClipboard(QClipboard::Mode mode)
+{
+    if (mode != QClipboard::Clipboard)
+        return;
+
+    QString text = clipboard->text(QClipboard::Clipboard);
+
+    qDebug() << text;
+
+    if (!connected && !m_useClipboard)
+        return;
+
+    ui->textEdit->setText(text);
+    activate();
+}
+
 bool MainWindow::eventFilter(QObject *object, QEvent *event)
 {
     if (object == ui->textEdit && event->type() == QEvent::KeyPress)
@@ -213,10 +247,26 @@ void MainWindow::showOptionsDialog()
 
     optionsDialog->setCloseOnSystemTray(m_closeOnSystemTray);
     optionsDialog->setStartMinimized(m_startMinimized);
+    optionsDialog->setUseClipboard(m_useClipboard);
 
     if (optionsDialog->exec()) {
         m_closeOnSystemTray = optionsDialog->closeOnSystemTray();
         m_startMinimized = optionsDialog->startMinimized();
+        m_useClipboard = optionsDialog->useClipboard();
+
+        if (optionsDialog->speak() != "-") {
+            QString speak = optionsDialog->speak();
+            bool speakCtrl = optionsDialog->speakCtrl();
+            bool speakAlt = optionsDialog->speakAlt();
+
+            HotKey tempKey;
+            tempKey.setCode(speak);
+            tempKey.setCtrl(speakCtrl);
+            tempKey.setAlt(speakAlt);
+            hotKeyThread->setStopped(true);
+            hotKeyThread->setClipboardKey(tempKey);
+            hotKeyThread->start();
+        }
     }
 }
 
@@ -296,6 +346,8 @@ void MainWindow::readSettings()
     alts = settings.value("alts").toStringList();
     m_closeOnSystemTray = settings.value("systemTray", false).toBool();
     m_startMinimized = settings.value("minimized", false).toBool();
+    m_useClipboard = settings.value("useClipboard", false).toBool();
+
     appFontFamily = settings.value("fontFamily").toString();
     appFontSize = settings.value("fontSize", 12).toInt();
     bold = settings.value("bold", false).toBool();
@@ -362,8 +414,14 @@ void MainWindow::readSettings()
         hotKeyThread->setStopped(true);
     }
 
-    hotKeyThread->setKeys(hotKeys);
-    hotKeyThread->start();
+
+        tempKey.setCode("0");
+        tempKey.setAlt(true);
+        hotKeyThread->setClipboardKey(tempKey);
+
+        hotKeyThread->setKeys(hotKeys);
+        hotKeyThread->start();
+
 
 
     ui->listWidget->addItems(phrases);
@@ -405,6 +463,7 @@ void MainWindow::writeSettings()
     settings.setValue("splitter2-size2", ui->splitter_2->sizes().at(1));
     settings.setValue("systemTray", m_closeOnSystemTray);
     settings.setValue("minimized", m_startMinimized);
+    settings.setValue("useClipboard", m_useClipboard);
     settings.setValue("fontFamily", appFont.family());
     settings.setValue("fontSize", appFont.pointSize());
     settings.setValue("bold", bold);

@@ -13,14 +13,18 @@ public:
     void setStopped(bool stopped);
     void setKeys(QVector<HotKey> keys);
 
+    void setClipboardKey(const HotKey &newClipboardKey);
+
 signals:
     void sendText(QString text);
+    void clipboardEnabled();
 
 protected:
     void run();
 
 private:    
     QVector<HotKey> hotKeys;
+    HotKey clipboardKey;
     bool stopped = false;
 };
 

@@ -18,6 +18,8 @@ ShortcutWidget::ShortcutWidget(QWidget *parent) :
     // Create a layout for the content widget
     contentLayout = new QVBoxLayout(contentWidget);
 
+    comboBoxFiller = new ComboBoxFiller();
+
     // Create and add labels dynamically
     for (int i = 0; i < 100; i++)
     {
@@ -32,7 +34,8 @@ ShortcutWidget::ShortcutWidget(QWidget *parent) :
         innerLayout->addWidget(lineEdit);
         lineEdits.append(lineEdit);
 
-        MyCombobox *combobox = new MyCombobox();
+        QComboBox *combobox = new QComboBox();
+        comboBoxFiller->fill(combobox);
         innerLayout->addWidget(combobox);
         comboboxes.append(combobox);
 
@@ -69,7 +72,7 @@ ShortcutWidget::ShortcutWidget(QWidget *parent) :
 
 void ShortcutWidget::setKeys(QVector<HotKey> *hotkeys)
 {
-    for (int i = 1; i < hotkeys->size(); i++) {
+    for (int i = 0; i < hotkeys->size(); i++) {
         lineEdits.at(i)->setText(hotkeys->at(i).phrase);
         comboboxes.at(i)->setCurrentText(hotkeys->at(i).code);
         if (hotkeys->at(i).ctrl != 0)
@@ -85,6 +88,8 @@ void ShortcutWidget::setKeys(QVector<HotKey> *hotkeys)
 
 ShortcutWidget::~ShortcutWidget()
 {
+    delete comboBoxFiller;
+
     for (int i = 0; i < hotkeys.size(); i++) {
         delete hotkeys.at(i);
     }
@@ -123,7 +128,7 @@ void ShortcutWidget::okButtonPressed()
 
 
     for (int i = 0; i < 100; i++) {
-        if (!lineEdits.at(i)->text().isEmpty() && !comboboxes.at(i)->currentText().isEmpty()) {
+        if (!lineEdits.at(i)->text().isEmpty() && !(comboboxes.at(i)->currentText() == "-")) {
             HotKey *key = new HotKey();
             key->phrase = lineEdits.at(i)->text();
             key->setCode(comboboxes.at(i)->currentText());
@@ -141,4 +146,10 @@ void ShortcutWidget::clearButtonPressed(int i)
 {
     QLineEdit *lineEdit = lineEdits.at(i);
     lineEdit->clear();
+    QComboBox *comboBox = comboboxes.at(i);
+    comboBox->setCurrentIndex(0);
+    QCheckBox *checkBox = ctrlBoxes.at(i);
+    checkBox->setChecked(false);
+    checkBox = altBoxes.at(i);
+    checkBox->setChecked(false);
 }

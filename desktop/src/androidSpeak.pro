@@ -10,12 +10,12 @@ CONFIG += c++17
 HEADERS       = chatdialog.h \
                 client.h \
                 clientsocket.h \
+                comboBoxFiller.h \
                 connection.h \
                 fontsettingsdialog.h \
                 hotKey.h \
                 hotKeyThread.h \
                 mainwindow.h \
-                myCombobox.h \
                 myPushbutton.h \
                 mythread.h \
                 optionsDialog.h \
@@ -26,13 +26,13 @@ HEADERS       = chatdialog.h \
 SOURCES       = chatdialog.cpp \
                 client.cpp \
                 clientsocket.cpp \
+                comboBoxFiller.cpp \
                 connection.cpp \
                 fontsettingsdialog.cpp \
                 hotKey.cpp \
                 hotKeyThread.cpp \
                 main.cpp \
                 mainwindow.cpp \
-                myCombobox.cpp \
                 myPushbutton.cpp \
                 mythread.cpp \
                 optionsDialog.cpp \

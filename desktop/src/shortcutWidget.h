@@ -3,8 +3,9 @@
 
 #include <QWidget>
 #include <QLineEdit>
-#include "myCombobox.h"
+#include <QComboBox>
 #include <QCheckBox>
+#include "comboBoxFiller.h"
 
 #include "hotKey.h"
 
@@ -47,7 +48,8 @@ private:
     QVBoxLayout* mainLayout;
 
     QVector<QLineEdit*>lineEdits;
-    QVector<MyCombobox*>comboboxes;
+    QVector<QComboBox*>comboboxes;
+    ComboBoxFiller *comboBoxFiller;
     QVector<QCheckBox*>ctrlBoxes;
     QVector<QCheckBox*>altBoxes;
     QVector<MyPushButton*>clearButtons;

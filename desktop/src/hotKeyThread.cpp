@@ -32,7 +32,12 @@ HotKeyThread::~HotKeyThread()
         XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask, grab_window);
         XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | Mod2Mask, grab_window);
         XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask | Mod2Mask, grab_window);
-    } 
+    }
+
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
 }
 
 void HotKeyThread::run()
@@ -65,6 +70,19 @@ void HotKeyThread::run()
                  keyboard_mode);
     }
 
+    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+
     XSelectInput(dpy, root, KeyPressMask);
     while(!stopped)
     {
@@ -82,6 +100,12 @@ void HotKeyThread::run()
                             emit sendText(hotKeys.at(i).phrase);
                     }
                 }
+
+                if ( (key == clipboardKey.keychar || key == clipboardKey.keychar2) &&
+                    ev.xkey.state & clipboardKey.modifiers) {
+                    emit clipboardEnabled();
+                }
+
             }
         }
     }
@@ -93,5 +117,23 @@ void HotKeyThread::run()
         XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask | Mod2Mask, grab_window);
     }
 
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
+
     XCloseDisplay(dpy);
+}
+
+void HotKeyThread::setClipboardKey(const HotKey &newClipboardKey)
+{
+    Display    *dpy     =  XOpenDisplay(0);
+    Window      root    = DefaultRootWindow(dpy);
+    Window          grab_window     = root;
+
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
+    clipboardKey = newClipboardKey;
 }

@@ -9,6 +9,7 @@
 #include "shortcutWidget.h"
 #include "optionsDialog.h"
 #include "fontsettingsdialog.h"
+#include <QClipboard>
 
 namespace Ui {
 class MainWindow;
@@ -31,6 +32,8 @@ public slots:
     void clientConnected();
     void clientDisconnected();
     void receiveShortCut(QString text);
+    void clipboardEnabled();
+    void speakClipboard(QClipboard::Mode mode);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
@@ -96,6 +99,10 @@ private:
     bool bold;
 
     QAction *showFontSettingsDialogAction;
+
+    QClipboard *clipboard;
+
+    bool m_useClipboard;
 };
 
 #endif // MAINWINDOW_H

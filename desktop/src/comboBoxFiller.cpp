@@ -1,0 +1,54 @@
+#include "comboBoxFiller.h"
+
+void ComboBoxFiller::fill(QComboBox *comboBox)
+{
+    comboBox->addItem("-");
+    comboBox->addItem("A");
+    comboBox->addItem("B");
+    comboBox->addItem("C");
+    comboBox->addItem("D");
+    comboBox->addItem("E");
+    comboBox->addItem("F");
+    comboBox->addItem("G");
+    comboBox->addItem("H");
+    comboBox->addItem("I");
+    comboBox->addItem("J");
+    comboBox->addItem("K");
+    comboBox->addItem("L");
+    comboBox->addItem("M");
+    comboBox->addItem("N");
+    comboBox->addItem("O");
+    comboBox->addItem("P");
+    comboBox->addItem("Q");
+    comboBox->addItem("R");
+    comboBox->addItem("S");
+    comboBox->addItem("T");
+    comboBox->addItem("U");
+    comboBox->addItem("V");
+    comboBox->addItem("W");
+    comboBox->addItem("X");
+    comboBox->addItem("Y");
+    comboBox->addItem("Z");
+    comboBox->addItem("0");
+    comboBox->addItem("1");
+    comboBox->addItem("2");
+    comboBox->addItem("3");
+    comboBox->addItem("4");
+    comboBox->addItem("5");
+    comboBox->addItem("6");
+    comboBox->addItem("7");
+    comboBox->addItem("8");
+    comboBox->addItem("9");
+    comboBox->addItem("F1");
+    comboBox->addItem("F2");
+    comboBox->addItem("F3");
+    comboBox->addItem("F4");
+    comboBox->addItem("F5");
+    comboBox->addItem("F6");
+    comboBox->addItem("F7");
+    comboBox->addItem("F8");
+    comboBox->addItem("F9");
+    comboBox->addItem("F10");
+    comboBox->addItem("F11");
+    comboBox->addItem("F12");
+}
