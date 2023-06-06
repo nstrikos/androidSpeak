@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QFontDatabase>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -42,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     hotKeyThread = new HotKeyThread();
     connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
     connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
+    connect(hotKeyThread, &HotKeyThread::stopPressed, this, &MainWindow::stopPressed);
 
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MainWindow::listWidgetClicked);
 
@@ -248,25 +250,47 @@ void MainWindow::showOptionsDialog()
     optionsDialog->setCloseOnSystemTray(m_closeOnSystemTray);
     optionsDialog->setStartMinimized(m_startMinimized);
     optionsDialog->setUseClipboard(m_useClipboard);
+    optionsDialog->setSpeak(m_clipboardKey);
+    optionsDialog->setSpeakCtrl(m_clipboardCtrl);
+    optionsDialog->setSpeakAlt(m_clipboardAlt);
+    optionsDialog->setStop(m_stopKey);
+    optionsDialog->setStopCtrl(m_stopCtrl);
+    optionsDialog->setStopAlt(m_stopAlt);
 
     if (optionsDialog->exec()) {
         m_closeOnSystemTray = optionsDialog->closeOnSystemTray();
         m_startMinimized = optionsDialog->startMinimized();
         m_useClipboard = optionsDialog->useClipboard();
 
-        if (optionsDialog->speak() != "-") {
-            QString speak = optionsDialog->speak();
-            bool speakCtrl = optionsDialog->speakCtrl();
-            bool speakAlt = optionsDialog->speakAlt();
+        hotKeyThread->setStopped(true);
 
+        m_clipboardKey = optionsDialog->speak();
+        m_clipboardCtrl = optionsDialog->speakCtrl();
+        m_clipboardAlt = optionsDialog->speakAlt();
+
+        if (optionsDialog->speak() != "") {
             HotKey tempKey;
-            tempKey.setCode(speak);
-            tempKey.setCtrl(speakCtrl);
-            tempKey.setAlt(speakAlt);
-            hotKeyThread->setStopped(true);
+            tempKey.setCode(m_clipboardKey);
+            tempKey.setCtrl(m_clipboardCtrl);
+            tempKey.setAlt(m_clipboardAlt);
             hotKeyThread->setClipboardKey(tempKey);
-            hotKeyThread->start();
         }
+
+        m_stopKey = optionsDialog->stop();
+        m_stopCtrl = optionsDialog->stopCtrl();
+        m_stopAlt = optionsDialog->stopAlt();
+
+        if (optionsDialog->stop() != "") {
+            HotKey tempKey;
+            tempKey.setCode(m_stopKey);
+            tempKey.setCtrl(m_stopCtrl);
+            tempKey.setAlt(m_stopAlt);
+            hotKeyThread->setStopKey(tempKey);
+
+            qDebug() << m_stopKey << m_stopCtrl << m_stopAlt;
+        }
+
+        hotKeyThread->start();
     }
 }
 
@@ -352,6 +376,14 @@ void MainWindow::readSettings()
     appFontSize = settings.value("fontSize", 12).toInt();
     bold = settings.value("bold", false).toBool();
 
+    m_clipboardKey = settings.value("clipboardKey", "").toString();
+    m_clipboardCtrl = settings.value("clipboardCtrl", false).toBool();
+    m_clipboardAlt = settings.value("clipboardAlt", false).toBool();
+
+    m_stopKey = settings.value("stopKey", "").toString();
+    m_stopCtrl = settings.value("stopCtrl", false).toBool();
+    m_stopAlt = settings.value("stopAlt", false).toBool();
+
     int x = settings.value("x", 0).toInt();
     int y = settings.value("y", 0).toInt();
     int width = settings.value("width", 800).toInt();
@@ -414,13 +446,23 @@ void MainWindow::readSettings()
         hotKeyThread->setStopped(true);
     }
 
-
-        tempKey.setCode("0");
-        tempKey.setAlt(true);
+    if (m_clipboardKey != "") {
+        tempKey.setCode(m_clipboardKey);
+        tempKey.setCtrl(m_clipboardCtrl);
+        tempKey.setAlt(m_clipboardAlt);
         hotKeyThread->setClipboardKey(tempKey);
+    }
 
-        hotKeyThread->setKeys(hotKeys);
-        hotKeyThread->start();
+    if (m_stopKey != "") {
+        tempKey.setCode(m_stopKey);
+        tempKey.setCtrl(m_stopCtrl);
+        tempKey.setAlt(m_stopAlt);
+        hotKeyThread->setStopKey(tempKey);
+    }
+
+
+    hotKeyThread->setKeys(hotKeys);
+    hotKeyThread->start();
 
 
 
@@ -467,6 +509,12 @@ void MainWindow::writeSettings()
     settings.setValue("fontFamily", appFont.family());
     settings.setValue("fontSize", appFont.pointSize());
     settings.setValue("bold", bold);
+    settings.setValue("clipboardKey", m_clipboardKey);
+    settings.setValue("clipboardCtrl", m_clipboardCtrl);
+    settings.setValue("clipboardAlt", m_clipboardAlt);
+    settings.setValue("stopKey", m_stopKey);
+    settings.setValue("stopCtrl", m_stopCtrl);
+    settings.setValue("stopAlt", m_stopAlt);
 }
 
 void MainWindow::showFontSettingsDialog()
@@ -491,6 +539,11 @@ void MainWindow::showFontSettingsDialog()
     }
 }
 
+void MainWindow::stopPressed()
+{
+    qDebug() << "stop pressed";
+}
+
 void MainWindow::activate()
 {
     if (!connected)
@@ -506,6 +559,5 @@ void MainWindow::activate()
     cursor.setPosition(0);
     ui->historyEdit->setTextCursor(cursor);
     ui->historyEdit->insertPlainText(text + "\n");
-
     ui->textEdit->setFocus();    
 }

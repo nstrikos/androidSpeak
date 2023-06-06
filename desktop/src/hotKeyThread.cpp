@@ -13,7 +13,24 @@ HotKeyThread::HotKeyThread()
 
 void HotKeyThread::setStopped(bool stopped)
 {
+    Display *dpy = XOpenDisplay(0);
+    Window root = DefaultRootWindow(dpy);
+
+    Window          grab_window     = root;
+
     this->stopped = stopped;
+
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    stopKey.keycode = 0;
 }
 
 void HotKeyThread::setKeys(QVector<HotKey> keys)
@@ -38,6 +55,11 @@ HotKeyThread::~HotKeyThread()
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window);
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window);
 }
 
 void HotKeyThread::run()
@@ -83,6 +105,19 @@ void HotKeyThread::run()
              pointer_mode,
              keyboard_mode);
 
+    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+
     XSelectInput(dpy, root, KeyPressMask);
     while(!stopped)
     {
@@ -106,6 +141,11 @@ void HotKeyThread::run()
                     emit clipboardEnabled();
                 }
 
+                if ( (key == stopKey.keychar || key == stopKey.keychar2) &&
+                    ev.xkey.state & stopKey.modifiers) {
+                    emit stopPressed();
+                }
+
             }
         }
     }
@@ -122,7 +162,26 @@ void HotKeyThread::run()
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
 
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window);
+
     XCloseDisplay(dpy);
+}
+
+void HotKeyThread::setStopKey(const HotKey &newStopKey)
+{
+    Display    *dpy     =  XOpenDisplay(0);
+    Window      root    = DefaultRootWindow(dpy);
+    Window          grab_window     = root;
+
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    stopKey = newStopKey;
 }
 
 void HotKeyThread::setClipboardKey(const HotKey &newClipboardKey)

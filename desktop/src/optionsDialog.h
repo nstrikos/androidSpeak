@@ -41,13 +41,23 @@ public:
     bool speakAlt() const;
     void setSpeakAlt(bool newSpeakAlt);
 
+    bool stopCtrl() const;
+    void setStopCtrl(bool newStopCtrl);
+
+    bool stopAlt() const;
+    void setStopAlt(bool newStopAlt);
+
 private slots:
     void checkBox1Changed();
     void checkBox2Changed();
     void speakClearButtonPressed();
-    void speakCheckBoxChanged();
+    void stopClearButtonPressed();
+    void speakCheckBoxChanged();   
     void speakCtrlChanged();
     void speakAltChanged();
+    void stopCheckBoxChanged();
+    void stopCtrlChanged();
+    void stopAltChanged();
 
 private:
     Ui::OptionsDialog *ui;
@@ -61,6 +71,8 @@ private:
     bool m_speakCtrl;
     bool m_speakAlt;
     QString m_stop;
+    bool m_stopCtrl;
+    bool m_stopAlt;
     QString m_activate;
 };
 

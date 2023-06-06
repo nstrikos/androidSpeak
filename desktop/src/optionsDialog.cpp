@@ -13,6 +13,11 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     connect(ui->comboBox, &QComboBox::currentTextChanged, this, &OptionsDialog::speakCheckBoxChanged);
     connect(ui->speakCtrlCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::speakCtrlChanged);
     connect(ui->speakAltCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::speakAltChanged);
+    connect(ui->comboBox_2, &QComboBox::currentTextChanged, this, &OptionsDialog::stopCheckBoxChanged);
+    connect(ui->stopCtrlCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::stopCtrlChanged);
+    connect(ui->stopAltCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::stopAltChanged);
+    connect(ui->stopClearButton, &QPushButton::pressed, this, &OptionsDialog::stopClearButtonPressed);
+
 
     comboBoxFiller = new ComboBoxFiller();
     comboBoxFiller->fill(ui->comboBox);
@@ -65,6 +70,13 @@ void OptionsDialog::speakClearButtonPressed()
     ui->speakAltCheckBox->setChecked(false);
 }
 
+void OptionsDialog::stopClearButtonPressed()
+{
+    ui->comboBox_2->setCurrentIndex(0);
+    ui->stopCtrlCheckBox->setChecked(false);
+    ui->stopAltCheckBox->setChecked(false);
+}
+
 void OptionsDialog::speakCheckBoxChanged()
 {
     m_speak = ui->comboBox->currentText();
@@ -80,6 +92,43 @@ void OptionsDialog::speakAltChanged()
     m_speakAlt = ui->speakAltCheckBox->isChecked();
 }
 
+void OptionsDialog::stopCheckBoxChanged()
+{
+    m_stop = ui->comboBox_2->currentText();
+}
+
+void OptionsDialog::stopCtrlChanged()
+{
+    m_stopCtrl = ui->stopCtrlCheckBox->isChecked();
+}
+
+void OptionsDialog::stopAltChanged()
+{
+    m_stopAlt = ui->stopAltCheckBox->isChecked();
+}
+
+bool OptionsDialog::stopAlt() const
+{
+    return m_stopAlt;
+}
+
+void OptionsDialog::setStopAlt(bool newStopAlt)
+{
+    m_stopAlt = newStopAlt;
+    ui->stopAltCheckBox->setChecked(m_stopAlt);
+}
+
+bool OptionsDialog::stopCtrl() const
+{
+    return m_stopCtrl;
+}
+
+void OptionsDialog::setStopCtrl(bool newStopCtrl)
+{
+    m_stopCtrl = newStopCtrl;
+    ui->stopCtrlCheckBox->setChecked(m_stopCtrl);
+}
+
 bool OptionsDialog::speakAlt() const
 {
     return m_speakAlt;
@@ -88,6 +137,7 @@ bool OptionsDialog::speakAlt() const
 void OptionsDialog::setSpeakAlt(bool newSpeakAlt)
 {
     m_speakAlt = newSpeakAlt;
+    ui->speakAltCheckBox->setChecked(m_speakAlt);
 }
 
 bool OptionsDialog::speakCtrl() const
@@ -98,6 +148,7 @@ bool OptionsDialog::speakCtrl() const
 void OptionsDialog::setSpeakCtrl(bool newSpeakCtrl)
 {
     m_speakCtrl = newSpeakCtrl;
+    ui->speakCtrlCheckBox->setChecked(m_speakCtrl);
 }
 
 QString OptionsDialog::activate() const
@@ -118,6 +169,7 @@ QString OptionsDialog::stop() const
 void OptionsDialog::setStop(const QString &newStop)
 {
     m_stop = newStop;
+    ui->comboBox_2->setCurrentText(m_stop);
 }
 
 QString OptionsDialog::speak() const
@@ -128,6 +180,7 @@ QString OptionsDialog::speak() const
 void OptionsDialog::setSpeak(const QString &newSpeak)
 {
     m_speak = newSpeak;
+    ui->comboBox->setCurrentText(m_speak);
 }
 
 bool OptionsDialog::useClipboard() const

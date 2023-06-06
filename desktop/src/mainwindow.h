@@ -54,6 +54,7 @@ private slots:
     void showOptionsDialog();
     void updateKeys(QVector<HotKey*>hotkeys);
     void showFontSettingsDialog();
+    void stopPressed();
 
 private:
     Ui::MainWindow *ui;
@@ -103,6 +104,12 @@ private:
     QClipboard *clipboard;
 
     bool m_useClipboard;
+    QString m_clipboardKey;
+    bool m_clipboardCtrl;
+    bool m_clipboardAlt;
+    QString m_stopKey;
+    bool m_stopCtrl;
+    bool m_stopAlt;
 };
 
 #endif // MAINWINDOW_H

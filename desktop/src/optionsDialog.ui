@@ -74,23 +74,23 @@
            <widget class="QComboBox" name="comboBox_2"/>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox_6">
+           <widget class="QCheckBox" name="stopCtrlCheckBox">
             <property name="text">
-             <string>CheckBox</string>
+             <string>Ctrl</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox_7">
+           <widget class="QCheckBox" name="stopAltCheckBox">
             <property name="text">
-             <string>CheckBox</string>
+             <string>Alt</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="stopClearButton">
             <property name="text">
-             <string>PushButton</string>
+             <string>Clear</string>
             </property>
            </widget>
           </item>

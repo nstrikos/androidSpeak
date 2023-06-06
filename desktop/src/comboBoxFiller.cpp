@@ -2,7 +2,7 @@
 
 void ComboBoxFiller::fill(QComboBox *comboBox)
 {
-    comboBox->addItem("-");
+    comboBox->addItem("");
     comboBox->addItem("A");
     comboBox->addItem("B");
     comboBox->addItem("C");

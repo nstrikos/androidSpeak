@@ -128,7 +128,7 @@ void ShortcutWidget::okButtonPressed()
 
 
     for (int i = 0; i < 100; i++) {
-        if (!lineEdits.at(i)->text().isEmpty() && !(comboboxes.at(i)->currentText() == "-")) {
+        if (!lineEdits.at(i)->text().isEmpty() && !(comboboxes.at(i)->currentText() == "")) {
             HotKey *key = new HotKey();
             key->phrase = lineEdits.at(i)->text();
             key->setCode(comboboxes.at(i)->currentText());
