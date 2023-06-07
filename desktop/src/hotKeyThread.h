@@ -17,10 +17,13 @@ public:
 
     void setStopKey(const HotKey &newStopKey);
 
+    void setActivateKey(const HotKey &newActivateKey);
+
 signals:
     void sendText(QString text);
     void clipboardEnabled();
     void stopPressed();
+    void activatePressed();
 
 protected:
     void run();
@@ -29,6 +32,7 @@ private:
     QVector<HotKey> hotKeys;
     HotKey clipboardKey;
     HotKey stopKey;
+    HotKey activateKey;
     bool stopped = false;
 };
 

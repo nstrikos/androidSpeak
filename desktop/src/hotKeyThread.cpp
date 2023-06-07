@@ -30,11 +30,36 @@ void HotKeyThread::setStopped(bool stopped)
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window);
     XUngrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window);
 
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    for (int i = 0; i < hotKeys.size(); i++) {
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers, grab_window);
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask, grab_window);
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | Mod2Mask, grab_window);
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask | Mod2Mask, grab_window);
+    }
+
     stopKey.keycode = 0;
+    clipboardKey.keycode = 0;
+    activateKey.keycode = 0;
 }
 
 void HotKeyThread::setKeys(QVector<HotKey> keys)
 {
+    Display    *dpy     =  XOpenDisplay(0);
+    Window      root    = DefaultRootWindow(dpy);
+    Window          grab_window     = root;
+
+    for (int i = 0; i < hotKeys.size(); i++) {
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers, grab_window);
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask, grab_window);
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | Mod2Mask, grab_window);
+        XUngrabKey(dpy, hotKeys.at(i).keycode, hotKeys.at(i).modifiers | LockMask | Mod2Mask, grab_window);
+    }
+
     hotKeys = keys;
 }
 
@@ -60,6 +85,11 @@ HotKeyThread::~HotKeyThread()
     XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window);
     XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window);
     XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window);
 }
 
 void HotKeyThread::run()
@@ -118,6 +148,19 @@ void HotKeyThread::run()
              pointer_mode,
              keyboard_mode);
 
+    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
+             pointer_mode,
+             keyboard_mode);
+
     XSelectInput(dpy, root, KeyPressMask);
     while(!stopped)
     {
@@ -146,6 +189,11 @@ void HotKeyThread::run()
                     emit stopPressed();
                 }
 
+                if ( (key == activateKey.keychar || key == activateKey.keychar2) &&
+                    ev.xkey.state & activateKey.modifiers) {
+                    emit activatePressed();
+                }
+
             }
         }
     }
@@ -167,7 +215,26 @@ void HotKeyThread::run()
     XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window);
     XUngrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window);
 
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window);
+
     XCloseDisplay(dpy);
+}
+
+void HotKeyThread::setActivateKey(const HotKey &newActivateKey)
+{
+    Display    *dpy     =  XOpenDisplay(0);
+    Window      root    = DefaultRootWindow(dpy);
+    Window          grab_window     = root;
+
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window);
+    XUngrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window);
+
+    activateKey = newActivateKey;
 }
 
 void HotKeyThread::setStopKey(const HotKey &newStopKey)

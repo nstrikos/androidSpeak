@@ -47,17 +47,27 @@ public:
     bool stopAlt() const;
     void setStopAlt(bool newStopAlt);
 
+    bool activateCtrl() const;
+    void setActivateCtrl(bool newActivateCtrl);
+
+    bool activateAlt() const;
+    void setActivateAlt(bool newActivateAlt);
+
 private slots:
     void checkBox1Changed();
     void checkBox2Changed();
     void speakClearButtonPressed();
     void stopClearButtonPressed();
+    void activateClearButtonPressed();
     void speakCheckBoxChanged();   
     void speakCtrlChanged();
     void speakAltChanged();
     void stopCheckBoxChanged();
     void stopCtrlChanged();
     void stopAltChanged();
+    void activateCheckBoxChanged();
+    void activateCtrlChanged();
+    void activateAltChanged();
 
 private:
     Ui::OptionsDialog *ui;
@@ -74,6 +84,8 @@ private:
     bool m_stopCtrl;
     bool m_stopAlt;
     QString m_activate;
+    bool m_activateCtrl;
+    bool m_activateAlt;
 };
 
 #endif // OPTIONSDIALOG_H

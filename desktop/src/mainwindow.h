@@ -55,6 +55,7 @@ private slots:
     void updateKeys(QVector<HotKey*>hotkeys);
     void showFontSettingsDialog();
     void stopPressed();
+    void activatePressed();
 
 private:
     Ui::MainWindow *ui;
@@ -110,6 +111,9 @@ private:
     QString m_stopKey;
     bool m_stopCtrl;
     bool m_stopAlt;
+    QString m_activateKey;
+    bool m_activateCtrl;
+    bool m_activateAlt;
 };
 
 #endif // MAINWINDOW_H

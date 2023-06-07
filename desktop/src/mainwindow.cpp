@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
     connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
     connect(hotKeyThread, &HotKeyThread::stopPressed, this, &MainWindow::stopPressed);
+    connect(hotKeyThread, &HotKeyThread::activatePressed, this, &MainWindow::activatePressed);
 
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MainWindow::listWidgetClicked);
 
@@ -144,6 +145,7 @@ void MainWindow::clientDisconnected()
 
 void MainWindow::receiveShortCut(QString text)
 {
+    qDebug() << text;
     if (!connected)
         return;
     ui->textEdit->setText(text);
@@ -256,6 +258,9 @@ void MainWindow::showOptionsDialog()
     optionsDialog->setStop(m_stopKey);
     optionsDialog->setStopCtrl(m_stopCtrl);
     optionsDialog->setStopAlt(m_stopAlt);
+    optionsDialog->setActivate(m_activateKey);
+    optionsDialog->setActivateCtrl(m_activateCtrl);
+    optionsDialog->setActivateAlt(m_activateAlt);
 
     if (optionsDialog->exec()) {
         m_closeOnSystemTray = optionsDialog->closeOnSystemTray();
@@ -263,6 +268,8 @@ void MainWindow::showOptionsDialog()
         m_useClipboard = optionsDialog->useClipboard();
 
         hotKeyThread->setStopped(true);
+
+        hotKeyThread->setKeys(hotKeys);
 
         m_clipboardKey = optionsDialog->speak();
         m_clipboardCtrl = optionsDialog->speakCtrl();
@@ -273,6 +280,7 @@ void MainWindow::showOptionsDialog()
             tempKey.setCode(m_clipboardKey);
             tempKey.setCtrl(m_clipboardCtrl);
             tempKey.setAlt(m_clipboardAlt);
+
             hotKeyThread->setClipboardKey(tempKey);
         }
 
@@ -285,10 +293,28 @@ void MainWindow::showOptionsDialog()
             tempKey.setCode(m_stopKey);
             tempKey.setCtrl(m_stopCtrl);
             tempKey.setAlt(m_stopAlt);
-            hotKeyThread->setStopKey(tempKey);
 
-            qDebug() << m_stopKey << m_stopCtrl << m_stopAlt;
+            hotKeyThread->setStopKey(tempKey);
         }
+
+        m_activateKey = optionsDialog->activate();
+        m_activateCtrl = optionsDialog->activateCtrl();
+        m_activateAlt = optionsDialog->activateAlt();
+
+        if (optionsDialog->activate() != "") {
+            HotKey tempKey;
+            tempKey.setCode(m_activateKey);
+            tempKey.setCtrl(m_activateCtrl);
+            tempKey.setAlt(m_activateAlt);
+
+            hotKeyThread->setActivateKey(tempKey);
+        }
+
+        for (int i = 0; i < hotKeys.size(); i++) {
+            qDebug() << i << hotKeys.at(i).phrase;
+        }
+
+
 
         hotKeyThread->start();
     }
@@ -316,6 +342,25 @@ void MainWindow::updateKeys(QVector<HotKey *>hotkeys)
     }
 
     hotKeyThread->setKeys(hotKeys);
+
+    tempKey.setCode(m_clipboardKey);
+    tempKey.setCtrl(m_clipboardCtrl);
+    tempKey.setAlt(m_clipboardAlt);
+
+    hotKeyThread->setClipboardKey(tempKey);
+
+    tempKey.setCode(m_stopKey);
+    tempKey.setCtrl(m_stopCtrl);
+    tempKey.setAlt(m_stopAlt);
+
+    hotKeyThread->setStopKey(tempKey);
+
+    tempKey.setCode(m_activateKey);
+    tempKey.setCtrl(m_activateCtrl);
+    tempKey.setAlt(m_activateAlt);
+
+    hotKeyThread->setActivateKey(tempKey);
+
     hotKeyThread->start();
 }
 
@@ -383,6 +428,10 @@ void MainWindow::readSettings()
     m_stopKey = settings.value("stopKey", "").toString();
     m_stopCtrl = settings.value("stopCtrl", false).toBool();
     m_stopAlt = settings.value("stopAlt", false).toBool();
+
+    m_activateKey = settings.value("activateKey", "").toString();
+    m_activateCtrl = settings.value("activateCtrl", false).toBool();
+    m_activateAlt = settings.value("activateAlt", false).toBool();
 
     int x = settings.value("x", 0).toInt();
     int y = settings.value("y", 0).toInt();
@@ -460,6 +509,12 @@ void MainWindow::readSettings()
         hotKeyThread->setStopKey(tempKey);
     }
 
+    if (m_activateKey != "") {
+        tempKey.setCode(m_activateKey);
+        tempKey.setCtrl(m_activateCtrl);
+        tempKey.setAlt(m_activateAlt);
+        hotKeyThread->setActivateKey(tempKey);
+    }
 
     hotKeyThread->setKeys(hotKeys);
     hotKeyThread->start();
@@ -515,6 +570,9 @@ void MainWindow::writeSettings()
     settings.setValue("stopKey", m_stopKey);
     settings.setValue("stopCtrl", m_stopCtrl);
     settings.setValue("stopAlt", m_stopAlt);
+    settings.setValue("activateKey", m_activateKey);
+    settings.setValue("activateCtrl", m_activateCtrl);
+    settings.setValue("activateAlt", m_activateAlt);
 }
 
 void MainWindow::showFontSettingsDialog()
@@ -542,6 +600,11 @@ void MainWindow::showFontSettingsDialog()
 void MainWindow::stopPressed()
 {
     qDebug() << "stop pressed";
+}
+
+void MainWindow::activatePressed()
+{
+    this->show();
 }
 
 void MainWindow::activate()

@@ -1,6 +1,8 @@
 #include "optionsDialog.h"
 #include "ui_optionsDialog.h"
 
+#include <QDebug>
+
 OptionsDialog::OptionsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::OptionsDialog)
@@ -17,6 +19,10 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     connect(ui->stopCtrlCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::stopCtrlChanged);
     connect(ui->stopAltCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::stopAltChanged);
     connect(ui->stopClearButton, &QPushButton::pressed, this, &OptionsDialog::stopClearButtonPressed);
+    connect(ui->comboBox_3, &QComboBox::currentTextChanged, this, &OptionsDialog::activateCheckBoxChanged);
+    connect(ui->activateCtrlCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::activateCtrlChanged);
+    connect(ui->activateAltCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::activateAltChanged);
+    connect(ui->activateClearButton, &QPushButton::pressed, this, &OptionsDialog::activateClearButtonPressed);
 
 
     comboBoxFiller = new ComboBoxFiller();
@@ -77,6 +83,13 @@ void OptionsDialog::stopClearButtonPressed()
     ui->stopAltCheckBox->setChecked(false);
 }
 
+void OptionsDialog::activateClearButtonPressed()
+{
+    ui->comboBox_3->setCurrentIndex(0);
+    ui->activateCtrlCheckBox->setChecked(false);
+    ui->activateAltCheckBox->setChecked(false);
+}
+
 void OptionsDialog::speakCheckBoxChanged()
 {
     m_speak = ui->comboBox->currentText();
@@ -105,6 +118,43 @@ void OptionsDialog::stopCtrlChanged()
 void OptionsDialog::stopAltChanged()
 {
     m_stopAlt = ui->stopAltCheckBox->isChecked();
+}
+
+void OptionsDialog::activateCheckBoxChanged()
+{
+    m_activate = ui->comboBox_3->currentText();
+}
+
+void OptionsDialog::activateCtrlChanged()
+{
+    m_activateCtrl = ui->activateCtrlCheckBox->isChecked();
+}
+
+void OptionsDialog::activateAltChanged()
+{
+    m_activateAlt = ui->activateAltCheckBox->isChecked();
+}
+
+bool OptionsDialog::activateAlt() const
+{
+    return m_activateAlt;
+}
+
+void OptionsDialog::setActivateAlt(bool newActivateAlt)
+{
+    m_activateAlt = newActivateAlt;
+    ui->activateAltCheckBox->setChecked(m_activateAlt);
+}
+
+bool OptionsDialog::activateCtrl() const
+{
+    return m_activateCtrl;
+}
+
+void OptionsDialog::setActivateCtrl(bool newActivateCtrl)
+{
+    m_activateCtrl = newActivateCtrl;
+    ui->activateCtrlCheckBox->setChecked(m_activateCtrl);
 }
 
 bool OptionsDialog::stopAlt() const
@@ -159,6 +209,7 @@ QString OptionsDialog::activate() const
 void OptionsDialog::setActivate(const QString &newActivate)
 {
     m_activate = newActivate;
+    ui->comboBox_3->setCurrentText(m_activate);
 }
 
 QString OptionsDialog::stop() const
