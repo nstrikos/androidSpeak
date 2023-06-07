@@ -267,67 +267,25 @@ void MainWindow::showOptionsDialog()
         m_startMinimized = optionsDialog->startMinimized();
         m_useClipboard = optionsDialog->useClipboard();
 
-        hotKeyThread->setStopped(true);
-
-        hotKeyThread->setKeys(hotKeys);
-
         m_clipboardKey = optionsDialog->speak();
         m_clipboardCtrl = optionsDialog->speakCtrl();
         m_clipboardAlt = optionsDialog->speakAlt();
-
-        if (optionsDialog->speak() != "") {
-            HotKey tempKey;
-            tempKey.setCode(m_clipboardKey);
-            tempKey.setCtrl(m_clipboardCtrl);
-            tempKey.setAlt(m_clipboardAlt);
-
-            hotKeyThread->setClipboardKey(tempKey);
-        }
 
         m_stopKey = optionsDialog->stop();
         m_stopCtrl = optionsDialog->stopCtrl();
         m_stopAlt = optionsDialog->stopAlt();
 
-        if (optionsDialog->stop() != "") {
-            HotKey tempKey;
-            tempKey.setCode(m_stopKey);
-            tempKey.setCtrl(m_stopCtrl);
-            tempKey.setAlt(m_stopAlt);
-
-            hotKeyThread->setStopKey(tempKey);
-        }
-
         m_activateKey = optionsDialog->activate();
         m_activateCtrl = optionsDialog->activateCtrl();
         m_activateAlt = optionsDialog->activateAlt();
 
-        if (optionsDialog->activate() != "") {
-            HotKey tempKey;
-            tempKey.setCode(m_activateKey);
-            tempKey.setCtrl(m_activateCtrl);
-            tempKey.setAlt(m_activateAlt);
-
-            hotKeyThread->setActivateKey(tempKey);
-        }
-
-        for (int i = 0; i < hotKeys.size(); i++) {
-            qDebug() << i << hotKeys.at(i).phrase;
-        }
-
-
-
-        hotKeyThread->start();
+        setKeys();
     }
 }
 
 void MainWindow::updateKeys(QVector<HotKey *>hotkeys)
 {
-    if (hotKeyThread != nullptr) {
-        hotKeyThread->setStopped(true);
-    }
-
     ui->listWidget->clear();
-
 
     HotKey tempKey;
     hotKeys.clear();
@@ -341,27 +299,7 @@ void MainWindow::updateKeys(QVector<HotKey *>hotkeys)
         ui->listWidget->addItem(tempKey.phrase);
     }
 
-    hotKeyThread->setKeys(hotKeys);
-
-    tempKey.setCode(m_clipboardKey);
-    tempKey.setCtrl(m_clipboardCtrl);
-    tempKey.setAlt(m_clipboardAlt);
-
-    hotKeyThread->setClipboardKey(tempKey);
-
-    tempKey.setCode(m_stopKey);
-    tempKey.setCtrl(m_stopCtrl);
-    tempKey.setAlt(m_stopAlt);
-
-    hotKeyThread->setStopKey(tempKey);
-
-    tempKey.setCode(m_activateKey);
-    tempKey.setCtrl(m_activateCtrl);
-    tempKey.setAlt(m_activateAlt);
-
-    hotKeyThread->setActivateKey(tempKey);
-
-    hotKeyThread->start();
+    setKeys();
 }
 
 void MainWindow::checkButton()
@@ -490,36 +428,7 @@ void MainWindow::readSettings()
         hotKeys.append(tempKey);
     }
 
-
-    if (hotKeyThread != nullptr) {
-        hotKeyThread->setStopped(true);
-    }
-
-    if (m_clipboardKey != "") {
-        tempKey.setCode(m_clipboardKey);
-        tempKey.setCtrl(m_clipboardCtrl);
-        tempKey.setAlt(m_clipboardAlt);
-        hotKeyThread->setClipboardKey(tempKey);
-    }
-
-    if (m_stopKey != "") {
-        tempKey.setCode(m_stopKey);
-        tempKey.setCtrl(m_stopCtrl);
-        tempKey.setAlt(m_stopAlt);
-        hotKeyThread->setStopKey(tempKey);
-    }
-
-    if (m_activateKey != "") {
-        tempKey.setCode(m_activateKey);
-        tempKey.setCtrl(m_activateCtrl);
-        tempKey.setAlt(m_activateAlt);
-        hotKeyThread->setActivateKey(tempKey);
-    }
-
-    hotKeyThread->setKeys(hotKeys);
-    hotKeyThread->start();
-
-
+    setKeys();
 
     ui->listWidget->addItems(phrases);
 }
@@ -573,6 +482,61 @@ void MainWindow::writeSettings()
     settings.setValue("activateKey", m_activateKey);
     settings.setValue("activateCtrl", m_activateCtrl);
     settings.setValue("activateAlt", m_activateAlt);
+}
+
+void MainWindow::setKeys()
+{
+    checkKeys();
+
+    HotKey tempKey;
+
+    if (hotKeyThread != nullptr) {
+        hotKeyThread->setStopped(true);
+    }
+
+    hotKeyThread->setKeys(hotKeys);
+
+    if (m_clipboardKey != "") {
+        tempKey.setCode(m_clipboardKey);
+        tempKey.setCtrl(m_clipboardCtrl);
+        tempKey.setAlt(m_clipboardAlt);
+        hotKeyThread->setClipboardKey(tempKey);
+    }
+
+    if (m_stopKey != "") {
+        tempKey.setCode(m_stopKey);
+        tempKey.setCtrl(m_stopCtrl);
+        tempKey.setAlt(m_stopAlt);
+        hotKeyThread->setStopKey(tempKey);
+    }
+
+    if (m_activateKey != "") {
+        tempKey.setCode(m_activateKey);
+        tempKey.setCtrl(m_activateCtrl);
+        tempKey.setAlt(m_activateAlt);
+        hotKeyThread->setActivateKey(tempKey);
+    }
+
+    hotKeyThread->start();
+}
+
+bool MainWindow::checkKeys()
+{
+    for (int i = 0; i < hotKeys.size(); i++) {
+        QString key1 = hotKeys.at(i).code;
+        bool ctrl1 = hotKeys.at(i).ctrl;
+        for (int n = i + 1; n < hotKeys.size(); n++) {
+            QString key2 = hotKeys.at(n).code;
+            bool ctrl2 = hotKeys.at(n).ctrl;
+            if (key1 == key2) {
+                if (ctrl1 == ctrl2) {
+                    qDebug() << key1 << ctrl1 << i << n;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 void MainWindow::showFontSettingsDialog()

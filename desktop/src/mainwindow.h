@@ -114,6 +114,10 @@ private:
     QString m_activateKey;
     bool m_activateCtrl;
     bool m_activateAlt;
+
+    void setKeys();
+
+    bool checkKeys();
 };
 
 #endif // MAINWINDOW_H
