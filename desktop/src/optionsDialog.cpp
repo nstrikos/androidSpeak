@@ -1,8 +1,6 @@
 #include "optionsDialog.h"
 #include "ui_optionsDialog.h"
 
-#include <QDebug>
-
 OptionsDialog::OptionsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::OptionsDialog)
@@ -10,7 +8,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->checkBox, &QCheckBox::stateChanged, this, &OptionsDialog::checkBox1Changed);
-    connect(ui->checkBox_2, &QCheckBox::stateChanged, this, &OptionsDialog::checkBox2Changed);
+    connect(ui->checkBox_2, &QCheckBox::stateChanged, this, &OptionsDialog::checkBox2Changed);    
     connect(ui->speakClearButton, &QPushButton::pressed, this, &OptionsDialog::speakClearButtonPressed);
     connect(ui->comboBox, &QComboBox::currentTextChanged, this, &OptionsDialog::speakCheckBoxChanged);
     connect(ui->speakCtrlCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::speakCtrlChanged);
@@ -23,7 +21,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     connect(ui->activateCtrlCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::activateCtrlChanged);
     connect(ui->activateAltCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::activateAltChanged);
     connect(ui->activateClearButton, &QPushButton::pressed, this, &OptionsDialog::activateClearButtonPressed);
-
+    connect(ui->clipboardCheckBox, &QCheckBox::stateChanged, this, &OptionsDialog::clipboardCheckBoxChanged);
 
     comboBoxFiller = new ComboBoxFiller();
     comboBoxFiller->fill(ui->comboBox);
@@ -133,6 +131,11 @@ void OptionsDialog::activateCtrlChanged()
 void OptionsDialog::activateAltChanged()
 {
     m_activateAlt = ui->activateAltCheckBox->isChecked();
+}
+
+void OptionsDialog::clipboardCheckBoxChanged()
+{
+    m_useClipboard = ui->clipboardCheckBox->isChecked();
 }
 
 bool OptionsDialog::activateAlt() const

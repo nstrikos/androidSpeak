@@ -1,8 +1,6 @@
 #include "shortcutWidget.h"
 #include "ui_shortcutWidget.h"
 
-#include <QDebug>
-
 ShortcutWidget::ShortcutWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ShortcutWidget)

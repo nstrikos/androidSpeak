@@ -4,7 +4,6 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QSettings>
-#include <QDebug>
 #include <QFontDatabase>
 #include <QFile>
 
@@ -72,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     clipboard = QApplication::clipboard();
     connect(clipboard, &QClipboard::changed, this, &MainWindow::speakClipboard);
-    m_useClipboard = false;
 }
 
 void MainWindow::init()
@@ -145,7 +143,6 @@ void MainWindow::clientDisconnected()
 
 void MainWindow::receiveShortCut(QString text)
 {
-    qDebug() << text;
     if (!connected)
         return;
     ui->textEdit->setText(text);
@@ -156,7 +153,6 @@ void MainWindow::clipboardEnabled()
 {
     QString text = clipboard->text(QClipboard::Selection);
 
-    qDebug() << text;
 
     if (!connected)
         return;
@@ -172,9 +168,7 @@ void MainWindow::speakClipboard(QClipboard::Mode mode)
 
     QString text = clipboard->text(QClipboard::Clipboard);
 
-    qDebug() << text;
-
-    if (!connected && !m_useClipboard)
+    if (!connected || !m_useClipboard)
         return;
 
     ui->textEdit->setText(text);
@@ -616,7 +610,7 @@ void MainWindow::showFontSettingsDialog()
 
 void MainWindow::stopPressed()
 {
-    qDebug() << "stop pressed";
+    stopButtonClicked();
 }
 
 void MainWindow::activatePressed()

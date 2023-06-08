@@ -68,6 +68,7 @@ private slots:
     void activateCheckBoxChanged();
     void activateCtrlChanged();
     void activateAltChanged();
+    void clipboardCheckBoxChanged();
 
 private:
     Ui::OptionsDialog *ui;
