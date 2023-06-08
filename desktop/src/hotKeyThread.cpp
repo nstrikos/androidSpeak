@@ -173,25 +173,37 @@ void HotKeyThread::run()
                 XLookupString(&ev.xkey,text,255,&key,0);
 
                 for (int i = 0; i < hotKeys.size(); i++) {
-                    if ( (key == hotKeys.at(i).keychar || key == hotKeys.at(i).keychar2) &&
-                        ev.xkey.state & hotKeys.at(i).modifiers) {
-                            emit sendText(hotKeys.at(i).phrase);
+                    if (key == hotKeys.at(i).keychar || key == hotKeys.at(i).keychar2) {
+                        if (hotKeys.at(i).ctrl == (ev.xkey.state & ControlMask)) {
+                            if (hotKeys.at(i).alt == ((ev.xkey.state & Mod1Mask))) {
+                                emit sendText(hotKeys.at(i).phrase);
+                            }
+                        }
                     }
                 }
 
-                if ( (key == clipboardKey.keychar || key == clipboardKey.keychar2) &&
-                    ev.xkey.state & clipboardKey.modifiers) {
-                    emit clipboardEnabled();
+                if (key == clipboardKey.keychar || key == clipboardKey.keychar2) {
+                    if (clipboardKey.ctrl == (ev.xkey.state & ControlMask)) {
+                        if (clipboardKey.alt == ((ev.xkey.state & Mod1Mask))) {
+                            emit clipboardEnabled();
+                        }
+                    }
                 }
 
-                if ( (key == stopKey.keychar || key == stopKey.keychar2) &&
-                    ev.xkey.state & stopKey.modifiers) {
-                    emit stopPressed();
+                if (key == stopKey.keychar || key == stopKey.keychar2) {
+                    if (stopKey.ctrl == (ev.xkey.state & ControlMask)) {
+                        if (stopKey.alt == ((ev.xkey.state & Mod1Mask))) {
+                            emit stopPressed();
+                        }
+                    }
                 }
 
-                if ( (key == activateKey.keychar || key == activateKey.keychar2) &&
-                    ev.xkey.state & activateKey.modifiers) {
-                    emit activatePressed();
+                if (key == activateKey.keychar || key == activateKey.keychar2) {
+                    if (activateKey.ctrl == (ev.xkey.state & ControlMask)) {
+                        if (activateKey.alt == ((ev.xkey.state & Mod1Mask))) {
+                            emit activatePressed();
+                        }
+                    }
                 }
 
             }
