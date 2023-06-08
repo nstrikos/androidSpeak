@@ -118,6 +118,7 @@ private:
     void setKeys();
 
     bool checkKeys();
+    QString doubleKeys;
 };
 
 #endif // MAINWINDOW_H

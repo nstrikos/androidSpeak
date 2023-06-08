@@ -486,7 +486,9 @@ void MainWindow::writeSettings()
 
 void MainWindow::setKeys()
 {
-    checkKeys();
+    if (!checkKeys()) {
+        QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
+    }
 
     HotKey tempKey;
 
@@ -522,21 +524,72 @@ void MainWindow::setKeys()
 
 bool MainWindow::checkKeys()
 {
+    doubleKeys.clear();
+
+    QVector<HotKey> keys;
+
+    HotKey tmpKey;
+
     for (int i = 0; i < hotKeys.size(); i++) {
-        QString key1 = hotKeys.at(i).code;
-        bool ctrl1 = hotKeys.at(i).ctrl;
-        for (int n = i + 1; n < hotKeys.size(); n++) {
-            QString key2 = hotKeys.at(n).code;
-            bool ctrl2 = hotKeys.at(n).ctrl;
+        tmpKey.code = hotKeys.at(i).code;
+        tmpKey.ctrl = hotKeys.at(i).ctrl;
+        tmpKey.alt = hotKeys.at(i).alt;
+        tmpKey.phrase = hotKeys.at(i).phrase;
+        keys.append(tmpKey);
+    }
+
+    if (m_clipboardKey != "") {
+        tmpKey.code = m_clipboardKey;
+        tmpKey.ctrl = m_clipboardCtrl;
+        tmpKey.alt = m_clipboardAlt;
+        tmpKey.phrase = "highlighted text shortcut";
+        keys.append(tmpKey);
+    }
+
+    if (m_stopKey != "") {
+        tmpKey.code = m_stopKey;
+        tmpKey.ctrl = m_stopCtrl;
+        tmpKey.alt = m_stopAlt;
+        tmpKey.phrase = "stop speaking shortcut";
+        keys.append(tmpKey);
+    }
+
+    if (m_activateKey != "") {
+        tmpKey.code = m_activateKey;
+        tmpKey.ctrl = m_activateCtrl;
+        tmpKey.alt = m_activateAlt;
+        tmpKey.phrase = "activate window shortcut";
+        keys.append(tmpKey);
+    }
+
+    for (int i = 0; i < keys.size(); i++) {
+        QString key1 = keys.at(i).code;
+        bool ctrl1 = keys.at(i).ctrl;
+        bool alt1 = keys.at(i).alt;
+        QString key2;
+        bool ctrl2;
+        bool alt2;
+        for (int n = i + 1; n < keys.size(); n++) {
+            key2 = keys.at(n).code;
+            ctrl2 = keys.at(n).ctrl;
+            alt2 = keys.at(n).alt;
             if (key1 == key2) {
                 if (ctrl1 == ctrl2) {
-                    qDebug() << key1 << ctrl1 << i << n;
+                    if (alt1 == alt2) {
+                        QString ctrl = ctrl1 ? "true" : "false";
+                        QString alt = alt1 ? "true" : "false";
+                        doubleKeys += "Key " + key1 + " ctrl:" + ctrl + " alt:" + alt + " is assigned to phrases:\n" +
+                                      keys.at(i).phrase + " and\n" + keys.at(n).phrase + "\n";
+                    }
                 }
             }
         }
     }
 
-    return true;
+    if (doubleKeys.isEmpty())
+        return true;
+    else
+        return false;
 }
 
 void MainWindow::showFontSettingsDialog()
