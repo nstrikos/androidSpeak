@@ -10,6 +10,7 @@
 #include "optionsDialog.h"
 #include "fontsettingsdialog.h"
 #include <QClipboard>
+#include <QLocalServer>
 
 namespace Ui {
 class MainWindow;
@@ -56,6 +57,11 @@ private slots:
     void showFontSettingsDialog();
     void stopPressed();
     void activatePressed();
+
+    void handleServerConnection();
+    void readServerMessage();
+    void startServer();
+    void disconnectServer();
 
 private:
     Ui::MainWindow *ui;
@@ -119,6 +125,8 @@ private:
 
     bool checkKeys();
     QString doubleKeys;
+
+    QLocalServer *server;
 };
 
 #endif // MAINWINDOW_H

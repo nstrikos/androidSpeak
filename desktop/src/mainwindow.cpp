@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QFontDatabase>
 #include <QFile>
+#include <QLocalSocket>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -71,6 +72,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     clipboard = QApplication::clipboard();
     connect(clipboard, &QClipboard::changed, this, &MainWindow::speakClipboard);
+
+    server = new QLocalServer(this);
+    connect(server, &QLocalServer::newConnection, this, &MainWindow::handleServerConnection);
+    startServer();
 }
 
 void MainWindow::init()
@@ -92,6 +97,8 @@ void MainWindow::shortcutActivated(QString text)
 
 MainWindow::~MainWindow()
 {
+    delete server;
+
     writeSettings();
 
     if (shortcutWindow != nullptr)
@@ -221,7 +228,7 @@ void MainWindow::textEditChanged()
 
 void MainWindow::showWindow()
 {
-    this->show();    
+    this->show();
 }
 
 void MainWindow::listWidgetClicked()
@@ -616,6 +623,51 @@ void MainWindow::stopPressed()
 void MainWindow::activatePressed()
 {
     this->show();
+    QWidget::activateWindow();
+}
+
+void MainWindow::startServer()
+{
+    if (!server->listen("androidSpeak")) {
+        qDebug() << "Unable to start server:" << server->errorString();
+        return;
+    }
+
+    qDebug() << "Server started. Waiting for incoming connections...";
+}
+
+void MainWindow::disconnectServer()
+{
+    qDebug() << "Server disconnected";
+}
+
+void MainWindow::handleServerConnection()
+{
+    QLocalSocket *clientConnection = server->nextPendingConnection();
+    connect(clientConnection, &QLocalSocket::readyRead, this, &MainWindow::readServerMessage);
+    connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
+    connect(clientConnection, &QLocalSocket::disconnected, this, &MainWindow::disconnectServer);
+
+    qDebug() << "New client connected";
+}
+
+void MainWindow::readServerMessage()
+{
+    QLocalSocket *clientConnection = qobject_cast<QLocalSocket*>(sender());
+    if (!clientConnection)
+        return;
+
+    QByteArray message = clientConnection->readAll();
+    qDebug() << "Received message:" << message;
+
+    // Process the message as needed
+
+    // Reply to the client (optional)
+    clientConnection->write("Message received");
+    clientConnection->flush();
+
+    if (message == "showWindow")
+        activatePressed();
 }
 
 void MainWindow::activate()
