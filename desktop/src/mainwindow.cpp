@@ -499,26 +499,26 @@ void MainWindow::setKeys()
 
     hotKeyThread->setKeys(hotKeys);
 
-    if (m_clipboardKey != "") {
+//    if (m_clipboardKey != "") {
         tempKey.setCode(m_clipboardKey);
         tempKey.setCtrl(m_clipboardCtrl);
         tempKey.setAlt(m_clipboardAlt);
         hotKeyThread->setClipboardKey(tempKey);
-    }
+//    }
 
-    if (m_stopKey != "") {
+//    if (m_stopKey != "") {
         tempKey.setCode(m_stopKey);
         tempKey.setCtrl(m_stopCtrl);
         tempKey.setAlt(m_stopAlt);
         hotKeyThread->setStopKey(tempKey);
-    }
+//    }
 
-    if (m_activateKey != "") {
+//    if (m_activateKey != "") {
         tempKey.setCode(m_activateKey);
         tempKey.setCtrl(m_activateCtrl);
         tempKey.setAlt(m_activateAlt);
         hotKeyThread->setActivateKey(tempKey);
-    }
+//    }
 
     hotKeyThread->start();
 }
@@ -624,6 +624,7 @@ void MainWindow::activatePressed()
 {
     this->show();
     QWidget::activateWindow();
+    ui->textEdit->setFocus();
 }
 
 void MainWindow::startServer()
