@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Omilo android</string>
+   <string>AndroidSpeak</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
@@ -148,7 +148,7 @@
      <x>0</x>
      <y>0</y>
      <width>783</width>
-     <height>23</height>
+     <height>29</height>
     </rect>
    </property>
   </widget>

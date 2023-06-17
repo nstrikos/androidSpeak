@@ -669,6 +669,12 @@ void MainWindow::readServerMessage()
 
     if (message == "showWindow")
         activatePressed();
+
+    if (message.startsWith("text:")) {
+        message = message.right(message.length() - 5);
+        ui->textEdit->setText(message);
+        activate();
+    }
 }
 
 void MainWindow::activate()
