@@ -44,7 +44,7 @@ void Chat::textToSpeechFinished()
 {
     if (m_textToSpeech.state() == QTextToSpeech::Ready) {
         if (m_speaking == false)
-            client.sendMessage("ok");
+            client.sendMessage("command-finished");
     }
     m_speaking = false;
 }

@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     server = new QLocalServer(this);
     connect(server, &QLocalServer::newConnection, this, &MainWindow::handleServerConnection);
     startServer();
+    clientConnection = nullptr;
 }
 
 void MainWindow::init()
@@ -180,6 +181,23 @@ void MainWindow::speakClipboard(QClipboard::Mode mode)
 
     ui->textEdit->setText(text);
     activate();
+}
+
+void MainWindow::receiveText(QString from, QString text)
+{
+    Q_UNUSED(from);
+
+    if (text == "command-finished") {
+        qDebug() << "Send ok command";
+        if (clientConnection != nullptr) {
+            qDebug() << "clientConnection is active";
+            clientConnection->write("ok");
+            clientConnection->flush();
+            clientConnection->deleteLater();
+            clientConnection = nullptr;
+            qDebug() << "Got here";
+        }
+    }
 }
 
 bool MainWindow::eventFilter(QObject *object, QEvent *event)
@@ -499,26 +517,26 @@ void MainWindow::setKeys()
 
     hotKeyThread->setKeys(hotKeys);
 
-//    if (m_clipboardKey != "") {
-        tempKey.setCode(m_clipboardKey);
-        tempKey.setCtrl(m_clipboardCtrl);
-        tempKey.setAlt(m_clipboardAlt);
-        hotKeyThread->setClipboardKey(tempKey);
-//    }
+    //    if (m_clipboardKey != "") {
+    tempKey.setCode(m_clipboardKey);
+    tempKey.setCtrl(m_clipboardCtrl);
+    tempKey.setAlt(m_clipboardAlt);
+    hotKeyThread->setClipboardKey(tempKey);
+    //    }
 
-//    if (m_stopKey != "") {
-        tempKey.setCode(m_stopKey);
-        tempKey.setCtrl(m_stopCtrl);
-        tempKey.setAlt(m_stopAlt);
-        hotKeyThread->setStopKey(tempKey);
-//    }
+    //    if (m_stopKey != "") {
+    tempKey.setCode(m_stopKey);
+    tempKey.setCtrl(m_stopCtrl);
+    tempKey.setAlt(m_stopAlt);
+    hotKeyThread->setStopKey(tempKey);
+    //    }
 
-//    if (m_activateKey != "") {
-        tempKey.setCode(m_activateKey);
-        tempKey.setCtrl(m_activateCtrl);
-        tempKey.setAlt(m_activateAlt);
-        hotKeyThread->setActivateKey(tempKey);
-//    }
+    //    if (m_activateKey != "") {
+    tempKey.setCode(m_activateKey);
+    tempKey.setCtrl(m_activateCtrl);
+    tempKey.setAlt(m_activateAlt);
+    hotKeyThread->setActivateKey(tempKey);
+    //    }
 
     hotKeyThread->start();
 }
@@ -640,13 +658,20 @@ void MainWindow::startServer()
 void MainWindow::disconnectServer()
 {
     qDebug() << "Server disconnected";
+
+    emit sendText("command-stop");
+
+    if (clientConnection != nullptr)
+        clientConnection->deleteLater();
+    clientConnection = nullptr;
+    qDebug() << "Got here";
 }
 
 void MainWindow::handleServerConnection()
 {
-    QLocalSocket *clientConnection = server->nextPendingConnection();
+    clientConnection = server->nextPendingConnection();
     connect(clientConnection, &QLocalSocket::readyRead, this, &MainWindow::readServerMessage);
-    connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
+    //connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
     connect(clientConnection, &QLocalSocket::disconnected, this, &MainWindow::disconnectServer);
 
     qDebug() << "New client connected";
@@ -664,8 +689,8 @@ void MainWindow::readServerMessage()
     // Process the message as needed
 
     // Reply to the client (optional)
-    clientConnection->write("Message received");
-    clientConnection->flush();
+    //clientConnection->write("Message received");
+    //clientConnection->flush();
 
     if (message == "showWindow")
         activatePressed();

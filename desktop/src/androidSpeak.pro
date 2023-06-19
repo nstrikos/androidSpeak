@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 HEADERS       = chatdialog.h \
                 client.h \
+                client2.h \
                 clientsocket.h \
                 comboBoxFiller.h \
                 connection.h \
@@ -25,6 +26,7 @@ HEADERS       = chatdialog.h \
                 tripserver.h
 SOURCES       = chatdialog.cpp \
                 client.cpp \
+                client2.cpp \
                 clientsocket.cpp \
                 comboBoxFiller.cpp \
                 connection.cpp \

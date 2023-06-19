@@ -35,6 +35,7 @@ public slots:
     void receiveShortCut(QString text);
     void clipboardEnabled();
     void speakClipboard(QClipboard::Mode mode);
+    void receiveText(QString from, QString text);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
@@ -127,6 +128,7 @@ private:
     QString doubleKeys;
 
     QLocalServer *server;
+    QLocalSocket *clientConnection;
 };
 
 #endif // MAINWINDOW_H
