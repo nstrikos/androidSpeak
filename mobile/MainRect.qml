@@ -44,53 +44,53 @@ Rectangle {
         }
     }
 
-    Rectangle {
-        id: settingsButton
-        border.color: "grey"
-        border.width: 7
-        radius: 15
-        anchors.top:  text2.bottom
-        anchors.topMargin: 50
-        anchors.right: parent.right
-        anchors.rightMargin: parent.width / 3
-        anchors.leftMargin: parent.width / 3
-        anchors.left: parent.left
-        height: 50
+//    Rectangle {
+//        id: settingsButton
+//        border.color: "grey"
+//        border.width: 7
+//        radius: 15
+//        anchors.top:  text2.bottom
+//        anchors.topMargin: 50
+//        anchors.right: parent.right
+//        anchors.rightMargin: parent.width / 3
+//        anchors.leftMargin: parent.width / 3
+//        anchors.left: parent.left
+//        height: 50
 
-        Text {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: parent.height
-            font.family: "Helvetica"
-            font.pointSize: 16
-            color: "green"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.WordWrap
-            text: qsTr("Settings")
-        }
+//        Text {
+//            anchors.top: parent.top
+//            anchors.left: parent.left
+//            anchors.right: parent.right
+//            height: parent.height
+//            font.family: "Helvetica"
+//            font.pointSize: 16
+//            color: "green"
+//            horizontalAlignment: Text.AlignHCenter
+//            verticalAlignment: Text.AlignVCenter
+//            wrapMode: Text.WordWrap
+//            text: qsTr("Settings")
+//        }
 
-        MouseArea {
-            anchors.fill: parent
-            onPressed: {
-                console.log("Settings pressed")
-                showSettings()
-            }
-        }
-    }
+//        MouseArea {
+//            anchors.fill: parent
+//            onPressed: {
+//                console.log("Settings pressed")
+//                showSettings()
+//            }
+//        }
+//    }
 
     function waitingStateEntered() {
         mainRect.color = "white"
         text.text = "Waiting to connect..."
         text2.text = "If you can't connect:\n1. Enable wifi\n2. Start desktop application"
         visible = true
-        settingsButton.visible = true
+        //settingsButton.visible = true
     }
 
     function showInfoStateEntered() {
         mainRect.color = "white"
-        settingsButton.visible = true
+        //settingsButton.visible = true
         visible = true
         text.text = qsTr("Connected")
         text2.text = "";
