@@ -36,15 +36,16 @@ MainWindow::MainWindow(QWidget *parent) :
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 
+    showAction = new QAction(tr("&Show"), this);
+    connect(showAction, &QAction::triggered, this, &MainWindow::showWindow);
+
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(showAction);
     trayIconMenu->addAction(quitAction);
     trayIcon->setContextMenu(trayIconMenu);
 
-    hotKeyThread = new HotKeyThread();
-    connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
-    connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
-    connect(hotKeyThread, &HotKeyThread::stopPressed, this, &MainWindow::stopPressed);
-    connect(hotKeyThread, &HotKeyThread::activatePressed, this, &MainWindow::activatePressed);
+    hotKeyThread = nullptr;
+
 
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MainWindow::listWidgetClicked);
 
@@ -118,6 +119,7 @@ MainWindow::~MainWindow()
     hotKeyThread->terminate();
     hotKeyThread->wait();
     delete hotKeyThread;
+    delete showAction;
     delete quitAction;
     delete trayIconMenu;
     delete trayIcon;
@@ -298,7 +300,12 @@ void MainWindow::showOptionsDialog()
         m_activateCtrl = optionsDialog->activateCtrl();
         m_activateAlt = optionsDialog->activateAlt();
 
-        setKeys();
+        if (!checkKeys()) {
+            QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
+        }
+
+        QMessageBox::information(this, tr("Androidspeak"), tr("Restart application for changes to take effect"));
+
     }
 }
 
@@ -318,7 +325,11 @@ void MainWindow::updateKeys(QVector<HotKey *>hotkeys)
         ui->listWidget->addItem(tempKey.phrase);
     }
 
-    setKeys();
+    if (!checkKeys()) {
+        QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
+    }
+
+    QMessageBox::information(this, tr("Androidspeak"), tr("Restart application for changes to take effect"));
 }
 
 void MainWindow::checkButton()
@@ -505,15 +516,24 @@ void MainWindow::writeSettings()
 
 void MainWindow::setKeys()
 {
-    if (!checkKeys()) {
-        QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
-    }
+
 
     HotKey tempKey;
 
-    if (hotKeyThread != nullptr) {
-        hotKeyThread->setStopped(true);
-    }
+//    if (hotKeyThread != nullptr) {
+//        hotKeyThread->setStopped(true);
+//        hotKeyThread->terminate();
+//        hotKeyThread->wait();
+//        delete hotKeyThread;
+
+//    }
+
+    hotKeyThread = new HotKeyThread();
+    connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
+    connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
+    connect(hotKeyThread, &HotKeyThread::stopPressed, this, &MainWindow::stopPressed);
+    connect(hotKeyThread, &HotKeyThread::activatePressed, this, &MainWindow::activatePressed);
+
 
     hotKeyThread->setKeys(hotKeys);
 

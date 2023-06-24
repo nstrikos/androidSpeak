@@ -68,6 +68,7 @@ private:
     Ui::MainWindow *ui;
     bool connected;
     QSystemTrayIcon *trayIcon;
+    QAction *showAction;
     QAction *quitAction;
     QMenu *trayIconMenu;
 
