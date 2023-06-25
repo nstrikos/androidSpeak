@@ -10,6 +10,7 @@ class HotKeyThread : public QThread
 public:
     HotKeyThread();
     ~HotKeyThread();
+    void setStopped(bool stopped);
     void setKeys(QVector<HotKey> keys);
 
     void setClipboardKey(const HotKey &newClipboardKey);
@@ -32,6 +33,7 @@ private:
     HotKey clipboardKey;
     HotKey stopKey;
     HotKey activateKey;
+    bool stopped = false;
 };
 
 #endif // HOTKEYTHREAD_H

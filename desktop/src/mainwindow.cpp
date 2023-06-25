@@ -44,8 +44,11 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIconMenu->addAction(quitAction);
     trayIcon->setContextMenu(trayIconMenu);
 
-    hotKeyThread = nullptr;
-
+    hotKeyThread = new HotKeyThread();
+    connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
+    connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
+    connect(hotKeyThread, &HotKeyThread::stopPressed, this, &MainWindow::stopPressed);
+    connect(hotKeyThread, &HotKeyThread::activatePressed, this, &MainWindow::activatePressed);
 
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MainWindow::listWidgetClicked);
 
@@ -300,12 +303,7 @@ void MainWindow::showOptionsDialog()
         m_activateCtrl = optionsDialog->activateCtrl();
         m_activateAlt = optionsDialog->activateAlt();
 
-        if (!checkKeys()) {
-            QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
-        }
-
-        QMessageBox::information(this, tr("Androidspeak"), tr("Restart application for changes to take effect"));
-
+        setKeys();
     }
 }
 
@@ -325,11 +323,7 @@ void MainWindow::updateKeys(QVector<HotKey *>hotkeys)
         ui->listWidget->addItem(tempKey.phrase);
     }
 
-    if (!checkKeys()) {
-        QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
-    }
-
-    QMessageBox::information(this, tr("Androidspeak"), tr("Restart application for changes to take effect"));
+    setKeys();
 }
 
 void MainWindow::checkButton()
@@ -516,24 +510,15 @@ void MainWindow::writeSettings()
 
 void MainWindow::setKeys()
 {
-
+    if (!checkKeys()) {
+        QMessageBox::information(this, tr("Androidspeak"), doubleKeys);
+    }
 
     HotKey tempKey;
 
-//    if (hotKeyThread != nullptr) {
-//        hotKeyThread->setStopped(true);
-//        hotKeyThread->terminate();
-//        hotKeyThread->wait();
-//        delete hotKeyThread;
-
-//    }
-
-    hotKeyThread = new HotKeyThread();
-    connect(hotKeyThread, &HotKeyThread::sendText, this, &MainWindow::receiveShortCut);
-    connect(hotKeyThread, &HotKeyThread::clipboardEnabled, this, &MainWindow::clipboardEnabled);
-    connect(hotKeyThread, &HotKeyThread::stopPressed, this, &MainWindow::stopPressed);
-    connect(hotKeyThread, &HotKeyThread::activatePressed, this, &MainWindow::activatePressed);
-
+    if (hotKeyThread != nullptr) {
+        hotKeyThread->setStopped(true);
+    }
 
     hotKeyThread->setKeys(hotKeys);
 

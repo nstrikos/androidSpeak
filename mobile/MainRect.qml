@@ -98,7 +98,7 @@ Rectangle {
 
     function connectedStateEntered() {
         mainRect.color = "black"
-        settingsButton.visible = false
+        //settingsButton.visible = false
         text.text = ""
         text2.text = ""
     }
