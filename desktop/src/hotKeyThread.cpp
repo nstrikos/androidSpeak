@@ -209,7 +209,7 @@ void HotKeyThread::run()
             }
         }
 
-        usleep(1000);
+        usleep(10000);
     }
 
     for (int i = 0; i < hotKeys.size(); i++) {

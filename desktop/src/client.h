@@ -15,6 +15,7 @@ class Client : public QObject
 
 public:
     Client();
+    ~Client();
     QString nickName() const;
     bool hasConnection(const QHostAddress &senderIp, int senderPort = -1) const;
 

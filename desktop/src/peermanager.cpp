@@ -85,7 +85,7 @@ void PeerManager::sendBroadcastDatagram()
             validBroadcastAddresses = false;
     }
 
-    if (!validBroadcastAddresses)
+    if (!validBroadcastAddresses || broadcastAddresses.size() == 0)
         updateAddresses();
 }
 

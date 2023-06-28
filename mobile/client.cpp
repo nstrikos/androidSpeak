@@ -18,6 +18,12 @@ Client::Client()
                      this, SLOT(newConnection(Connection*)));
 }
 
+Client::~Client()
+{
+    qDebug() << "delete client";
+    delete peerManager;
+}
+
 void Client::sendMessage(const QString &message)
 {
     if (message.isEmpty())

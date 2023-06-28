@@ -15,6 +15,7 @@ class Client : public QObject
 
 public:
     Client();
+    ~Client();
 
     void sendMessage(const QString &message);
     QString nickName() const;
