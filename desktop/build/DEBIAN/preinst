@@ -1,0 +1,2 @@
+rm -f /usr/bin/androidSpeak
+rm -rf /usr/share/androidSpeak

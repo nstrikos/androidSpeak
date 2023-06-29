@@ -1,0 +1,19 @@
+[Desktop Entry]
+Categories=Qt;Utility;Accessibility;
+Comment[el_GR]=Speak using your android phone
+Comment=Speak using your android phone
+Exec=/usr/bin/androidSpeak
+GenericName[el_GR]=
+GenericName=
+Icon=androidSpeak.png
+MimeType=
+Name[el_GR]=androidSpeak
+Name=androidSpeak
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+X-MultipleArgs=false

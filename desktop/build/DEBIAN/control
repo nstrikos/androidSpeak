@@ -1,0 +1,6 @@
+Package: androidSpeak
+Version: 0.2
+Architecture: amd64
+Maintainer: Nick Strikos <nstrikos@yahoo.gr>
+Depends: libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-render-util0, libxcb-xkb1, libxkbcommon-x11-0, libxcb-xinerama0
+Description: Speak using your android phone

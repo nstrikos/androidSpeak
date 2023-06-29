@@ -1,0 +1,7 @@
+#!/bin/sh
+ export LD_LIBRARY_PATH=/usr/share/androidSpeak/Qt_Libraries
+ export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/share/androidSpeak/Qt_Libraries/plugins/platforms
+ export QT_QPA_FONTDIR=/usr/share/androidSpeak/Qt_Libraries/fonts
+ export QT_PLUGIN_PATH=/usr/shareandroidSpeak/Qt_Libraries/plugins
+ export QT_QPA_PLATFORM=xcb
+ /usr/share/androidSpeak/androidSpeak $1
