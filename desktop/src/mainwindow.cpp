@@ -520,6 +520,8 @@ void MainWindow::setKeys()
         hotKeyThread->setStopped(true);
     }
 
+    hotKeyThread->wait();
+
     hotKeyThread->setKeys(hotKeys);
 
     //    if (m_clipboardKey != "") {
@@ -542,7 +544,6 @@ void MainWindow::setKeys()
     tempKey.setAlt(m_activateAlt);
     hotKeyThread->setActivateKey(tempKey);
     //    }
-
     hotKeyThread->start();
 }
 

@@ -205,10 +205,8 @@ void HotKeyThread::run()
                         }
                     }
                 }
-
             }
         }
-
         usleep(10000);
     }
 
