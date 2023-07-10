@@ -303,6 +303,8 @@ void MainWindow::showOptionsDialog()
         m_activateCtrl = optionsDialog->activateCtrl();
         m_activateAlt = optionsDialog->activateAlt();
 
+        writeSettings();
+
         setKeys();
     }
 }
