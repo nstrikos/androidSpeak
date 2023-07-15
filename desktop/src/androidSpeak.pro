@@ -7,9 +7,8 @@ CONFIG += c++17
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-HEADERS       = chatdialog.h \
+HEADERS       = \
                 client.h \
-                client2.h \
                 clientsocket.h \
                 comboBoxFiller.h \
                 connection.h \
@@ -21,12 +20,12 @@ HEADERS       = chatdialog.h \
                 mythread.h \
                 optionsDialog.h \
                 peermanager.h \
+                screenReaderClient.h \
                 server.h \
                 shortcutWidget.h \
                 tripserver.h
-SOURCES       = chatdialog.cpp \
+SOURCES       = \
                 client.cpp \
-                client2.cpp \
                 clientsocket.cpp \
                 comboBoxFiller.cpp \
                 connection.cpp \
@@ -39,10 +38,11 @@ SOURCES       = chatdialog.cpp \
                 mythread.cpp \
                 optionsDialog.cpp \
                 peermanager.cpp \
+                screenReaderClient.cpp \
                 server.cpp \
                 shortcutWidget.cpp \
                 tripserver.cpp
-FORMS         = chatdialog.ui \
+FORMS         = \
     fontsettingsdialog.ui \
     mainwindow.ui \
     optionsDialog.ui \

@@ -1,13 +1,13 @@
 #include <QApplication>
+#include <QSharedMemory>
+#include <QSharedMemory>
+#include <QSharedMemory>
 
-//#include "chatdialog.h"
+#include <signal.h>
+
 #include "mainwindow.h"
 #include "client.h"
-
-#include <QSharedMemory>
-#include <signal.h>
-#include <QLocalSocket>
-#include "client2.h"
+#include "screenReaderClient.h"
 
 static QSharedMemory sharedMemory;
 
@@ -18,14 +18,14 @@ void signalhandler(int sig)
     //it will detach the sharedMemory
     //This is needed mainly in ubuntu unity
     //Without this loging out prevents detaching sharedMemory
-    Q_UNUSED(sig);
+    printf("\nquit the application by signal(%d).\n", sig);
     sharedMemory.detach();
 }
 
 void catchUnixSignals(std::initializer_list<int> quitSignals) {
     auto handler = [](int sig) -> void {
         // blocking and not aysnc-signal-safe func are valid
-        //printf("\nquit the application by signal(%d).\n", sig);
+        printf("\nquit the application by signal(%d).\n", sig);
         QCoreApplication::quit();
     };
 
@@ -43,7 +43,7 @@ void catchUnixSignals(std::initializer_list<int> quitSignals) {
         sigaction(sig, &sa, nullptr);
 }
 
-void sendMessage()
+void sendShowWindow()
 {
     QLocalSocket socket;
     socket.connectToServer("androidSpeak");
@@ -62,61 +62,45 @@ void sendMessage()
     socket.waitForDisconnected();
 }
 
-void sendText(QString text)
+void startApplication(MainWindow &mainWindow, Client &client)
 {
-    QLocalSocket socket;
-    socket.connectToServer("androidSpeak");
+    signal(SIGSEGV, signalhandler);
+#ifndef Q_OS_WIN
+    signal(SIGKILL, signalhandler);
+#endif
+    signal(SIGTERM, signalhandler);
 
-    if (!socket.waitForConnected()) {
-        qDebug() << "Unable to connect to server:" << socket.errorString();
-    }
+    mainWindow.init();
 
-    QString message = "text:" + text;
-    qDebug() << "Sending message:" << message;
 
-    socket.write(message.toUtf8());
-    socket.flush();
-
-    socket.disconnectFromServer();
-    socket.waitForDisconnected();
+    QObject::connect(&mainWindow, &MainWindow::sendText, &client, &Client::sendMessage);
+    QObject::connect(&client, &Client::clientConnected, &mainWindow, &MainWindow::clientConnected);
+    QObject::connect(&client, &Client::clientDisconnected, &mainWindow, &MainWindow::clientDisconnected);
+    QObject::connect(&client, &Client::newMessage, &mainWindow, &MainWindow::receiveText);
 }
 
 int main(int argc, char *argv[])
 {
+    //Three ways of starting:
+    //1. Normal start of application
+    //2. If application is running, send a show window message
+    //3. If application name is followed by text, send text to the running application
     if (argc == 1) {
 
         QApplication app(argc, argv);
 
         sharedMemory.setKey("androidSpeak");
-        if(sharedMemory.attach())
-        {
-            //Do nothing;
-            ;
-        }
 
         if (!sharedMemory.create(1))
         {
-            sendMessage();
-            return 1;
+            sendShowWindow();
+            return 1;            
+        } else {
+            MainWindow mainWindow;
+            Client client;
+            startApplication(mainWindow, client);
+            return app.exec();
         }
-
-        signal(SIGSEGV, signalhandler);
-#ifndef Q_OS_WIN
-        signal(SIGKILL, signalhandler);
-#endif
-        signal(SIGTERM, signalhandler);
-
-        MainWindow mainWindow;
-        mainWindow.init();
-
-        Client client;
-
-        QObject::connect(&mainWindow, &MainWindow::sendText, &client, &Client::sendMessage);
-        QObject::connect(&client, &Client::clientConnected, &mainWindow, &MainWindow::clientConnected);
-        QObject::connect(&client, &Client::clientDisconnected, &mainWindow, &MainWindow::clientDisconnected);
-        QObject::connect(&client, &Client::newMessage, &mainWindow, &MainWindow::receiveText);
-
-        return app.exec();
     } else {
         QCoreApplication a(argc, argv);
 
@@ -135,9 +119,8 @@ int main(int argc, char *argv[])
         }
 
         catchUnixSignals({SIGQUIT, SIGINT, SIGTERM, SIGHUP});
-        Client2 client2(inputText);
+        ScreenReaderClient screenReaderClient(inputText);
 
         return a.exec();
-
     }
 }

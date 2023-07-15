@@ -704,9 +704,25 @@ void MainWindow::readServerMessage()
         activatePressed();
 
     if (message.startsWith("text:")) {
-        message = message.right(message.length() - 5);
-        ui->textEdit->setText(message);
-        activate();
+        if (connected) {
+            message = message.right(message.length() - 5);
+            ui->textEdit->setText(message);
+            activate();
+        } else {
+
+
+
+                qDebug() << "Not connected - send command to client";
+                if (clientConnection != nullptr) {
+                    qDebug() << "clientConnection is active";
+                    clientConnection->write("not connected");
+                    clientConnection->flush();
+                    clientConnection->deleteLater();
+                    clientConnection = nullptr;
+                    qDebug() << "Got here";
+                }
+
+        }
     }
 }
 
