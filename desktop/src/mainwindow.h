@@ -130,6 +130,8 @@ private:
 
     QLocalServer *server;
     QLocalSocket *clientConnection;
+
+    QString currentText;
 };
 
 #endif // MAINWINDOW_H

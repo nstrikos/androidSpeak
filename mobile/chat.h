@@ -28,6 +28,7 @@ private:
 
     TextToSpeech &m_textToSpeech;
     bool m_speaking = false;
+    QString m_text;
 };
 
 #endif // CHAT_H

@@ -192,15 +192,21 @@ void MainWindow::receiveText(QString from, QString text)
 {
     Q_UNUSED(from);
 
-    if (text == "command-finished") {
+    if (text.startsWith("command-finished:")) {
+        QString cmd = "command-finished:";
+        int length = cmd.length();
+        QString receivedText = text.right(text.length() - length);
+
+        if (receivedText != currentText)
+            return;
+
+
         qDebug() << "Send ok command";
         if (clientConnection != nullptr) {
-            qDebug() << "clientConnection is active";
             clientConnection->write("ok");
             clientConnection->flush();
             clientConnection->deleteLater();
             clientConnection = nullptr;
-            qDebug() << "Got here";
         }
     }
 }
@@ -733,6 +739,7 @@ void MainWindow::activate()
 
     QString text = ui->textEdit->document()->toPlainText();
     QString textToSend = "command-text:" + text;
+    currentText = text;
     emit sendText(textToSend);
     ui->textEdit->clear();
     ui->talkButton->setEnabled(false);

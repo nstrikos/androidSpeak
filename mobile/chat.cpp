@@ -20,13 +20,13 @@ void Chat::appendMessage(const QString &from, const QString &message)
     } else if (message.startsWith("command-text:")) {
         QString cmd = "command-text:";
         int length = cmd.length();
-        QString text = message.right(message.length() - length);
+        m_text = message.right(message.length() - length);
         if (m_textToSpeech.state() == QTextToSpeech::Ready)
             m_speaking = false;
         else
             m_speaking = true;
 
-        m_textToSpeech.speak(text);
+        m_textToSpeech.speak(m_text);
     }
 }
 
@@ -44,7 +44,7 @@ void Chat::textToSpeechFinished()
 {
     if (m_textToSpeech.state() == QTextToSpeech::Ready) {
         if (m_speaking == false)
-            client.sendMessage("command-finished");
+            client.sendMessage("command-finished:" + m_text);
     }
     m_speaking = false;
 }
