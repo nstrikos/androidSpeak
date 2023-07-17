@@ -89,7 +89,10 @@ void ScreenReaderClient::error(QLocalSocket::LocalSocketError socketError)
     if (debug)
         qDebug() << "Error occurred:" << socketError;
 
-    startProcess();
+    if (socketError == QLocalSocket::ServerNotFoundError)
+        startProcess();
+    else
+        closeConnection();
 }
 
 void ScreenReaderClient::processFinished()
@@ -105,10 +108,10 @@ void ScreenReaderClient::quit()
 
 void ScreenReaderClient::closeConnection()
 {
-        if (debug) {
-            qDebug() << "Closing connection.";
-        }
-        socket.close();
+    if (debug) {
+        qDebug() << "Closing connection.";
+    }
+    socket.close();
 
     QCoreApplication::quit();
 }

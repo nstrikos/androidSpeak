@@ -132,6 +132,8 @@ private:
     QLocalSocket *clientConnection;
 
     QString currentText;
+
+    void sendOkScreenReaderClient();
 };
 
 #endif // MAINWINDOW_H

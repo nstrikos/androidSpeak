@@ -104,6 +104,11 @@ MainWindow::~MainWindow()
 {
     delete server;
 
+    sendOkScreenReaderClient();
+
+    if (clientConnection != nullptr)
+        clientConnection->deleteLater();
+
     writeSettings();
 
     if (shortcutWindow != nullptr)
@@ -200,14 +205,8 @@ void MainWindow::receiveText(QString from, QString text)
         if (receivedText != currentText)
             return;
 
+        sendOkScreenReaderClient();
 
-        qDebug() << "Send ok command";
-        if (clientConnection != nullptr) {
-            clientConnection->write("ok");
-            clientConnection->flush();
-            clientConnection->deleteLater();
-            clientConnection = nullptr;
-        }
     }
 }
 
@@ -625,6 +624,17 @@ bool MainWindow::checkKeys()
         return false;
 }
 
+void MainWindow::sendOkScreenReaderClient()
+{
+    if (clientConnection != nullptr) {
+        qDebug() << "Send ok command";
+        clientConnection->write("ok");
+        clientConnection->flush();
+        clientConnection->deleteLater();
+        clientConnection = nullptr;
+    }
+}
+
 void MainWindow::showFontSettingsDialog()
 {
     if (fontSettingsDialog == NULL)
@@ -723,9 +733,9 @@ void MainWindow::readServerMessage()
                     qDebug() << "clientConnection is active";
                     clientConnection->write("not connected");
                     clientConnection->flush();
-                    clientConnection->deleteLater();
-                    clientConnection = nullptr;
-                    qDebug() << "Got here";
+                    //clientConnection->deleteLater();
+                    //clientConnection = nullptr;
+                    //qDebug() << "Got here";
                 }
 
         }
