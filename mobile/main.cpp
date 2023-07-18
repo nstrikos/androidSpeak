@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
 
     TextToSpeech textToSpeech;
 
+
+    //This is needed to stop speech when user exits mobile app
+    QObject::connect(&app, &QGuiApplication::aboutToQuit, &textToSpeech, &TextToSpeech::quit);
+
     Chat chat(textToSpeech);
 
     QQmlApplicationEngine engine;

@@ -36,6 +36,9 @@ public:
     double rate() const;
     void setRate(double rate);
 
+public slots:
+    void quit();
+
 signals:
     void stateChanged();
     void volumeChanged();

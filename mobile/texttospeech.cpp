@@ -60,6 +60,12 @@ void TextToSpeech::setRate(double rate)
     m_speech->setRate(m_rate);
 }
 
+void TextToSpeech::quit()
+{
+    if (m_speech != nullptr)
+        m_speech->stop();
+}
+
 void TextToSpeech::speak(QString text)
 {
     m_speech->say(text);
