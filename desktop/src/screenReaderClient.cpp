@@ -89,7 +89,8 @@ void ScreenReaderClient::error(QLocalSocket::LocalSocketError socketError)
     if (debug)
         qDebug() << "Error occurred:" << socketError;
 
-    if (socketError == QLocalSocket::ServerNotFoundError)
+    if (socketError == QLocalSocket::ServerNotFoundError ||
+        socketError == QLocalSocket::ConnectionRefusedError)
         startProcess();
     else
         closeConnection();

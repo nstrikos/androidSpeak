@@ -122,44 +122,50 @@ void HotKeyThread::run()
                  keyboard_mode);
     }
 
-    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
+    if (clipboardKey.keycode != 0) {
+        XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | Mod2Mask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, clipboardKey.keycode, clipboardKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+    }
 
-    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
+    if (stopKey.keycode != 0) {
+        XGrabKey(dpy, stopKey.keycode, stopKey.modifiers, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | Mod2Mask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, stopKey.keycode, stopKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+    }
 
-    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
-    XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
-             pointer_mode,
-             keyboard_mode);
+    if (activateKey.keycode != 0) {
+        XGrabKey(dpy, activateKey.keycode, activateKey.modifiers, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | Mod2Mask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+        XGrabKey(dpy, activateKey.keycode, activateKey.modifiers | LockMask | Mod2Mask, grab_window, owner_events,
+                 pointer_mode,
+                 keyboard_mode);
+    }
 
     XSelectInput(dpy, root, KeyPressMask);
     while(!stopped)
