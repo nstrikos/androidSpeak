@@ -129,6 +129,7 @@ MainWindow::~MainWindow()
     delete hotKeyThread;
     delete showAction;
     delete quitAction;
+    delete setupOrcaAction;
     delete trayIconMenu;
     delete trayIcon;
     delete fileMenu;
@@ -362,16 +363,20 @@ void MainWindow::createMenu()
     optionsDialogAction = new QAction(tr("Application options..."), this);
     showFontSettingsDialogAction = new QAction(tr("Font settings..."), this);
     showFontSettingsDialogAction->setShortcut(tr("Ctrl+F"));
+    setupOrcaAction = new QAction(tr("Setup orca"), this);
+    setupOrcaAction->setShortcut(tr("Ctrl+Shift+O"));
 
 
     connect(showShortcutAction, &QAction::triggered, this, &MainWindow::showShortcutDialog);
     connect(optionsDialogAction, &QAction::triggered, this, &MainWindow::showOptionsDialog);
     connect(showFontSettingsDialogAction, SIGNAL(triggered()), this, SLOT(showFontSettingsDialog()));
+    connect(setupOrcaAction, &QAction::triggered, this, &MainWindow::setupOrca);
 
     fileMenu = menuBar()->addMenu(tr("Options"));
     fileMenu->addAction(showShortcutAction);
     fileMenu->addAction(optionsDialogAction);
     fileMenu->addAction(showFontSettingsDialogAction);
+    fileMenu->addAction(setupOrcaAction);
 }
 
 void MainWindow::readSettings()
@@ -689,6 +694,16 @@ void MainWindow::disconnectServer()
         clientConnection->deleteLater();
     clientConnection = nullptr;
     qDebug() << "Got here";
+}
+
+void MainWindow::setupOrca()
+{
+    orcaSetup = new OrcaSetup();
+    orcaSetup->start();
+    m_closeOnSystemTray = true;
+    m_startMinimized = true;
+    writeSettings();
+    delete orcaSetup;
 }
 
 void MainWindow::handleServerConnection()

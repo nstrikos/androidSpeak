@@ -19,6 +19,7 @@ HEADERS       = \
                 myPushbutton.h \
                 mythread.h \
                 optionsDialog.h \
+                orcaSetup.h \
                 peermanager.h \
                 screenReaderClient.h \
                 server.h \
@@ -37,6 +38,7 @@ SOURCES       = \
                 myPushbutton.cpp \
                 mythread.cpp \
                 optionsDialog.cpp \
+                orcaSetup.cpp \
                 peermanager.cpp \
                 screenReaderClient.cpp \
                 server.cpp \

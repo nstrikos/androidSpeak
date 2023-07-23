@@ -9,6 +9,7 @@
 #include "shortcutWidget.h"
 #include "optionsDialog.h"
 #include "fontsettingsdialog.h"
+#include "orcaSetup.h"
 #include <QClipboard>
 #include <QLocalServer>
 
@@ -64,12 +65,15 @@ private slots:
     void startServer();
     void disconnectServer();
 
+    void setupOrca();
+
 private:
     Ui::MainWindow *ui;
     bool connected;
     QSystemTrayIcon *trayIcon;
     QAction *showAction;
     QAction *quitAction;
+    QAction *setupOrcaAction;
     QMenu *trayIconMenu;
 
     void activate();
@@ -134,6 +138,8 @@ private:
     QString currentText;
 
     void sendOkScreenReaderClient();
+
+    OrcaSetup *orcaSetup;
 };
 
 #endif // MAINWINDOW_H
