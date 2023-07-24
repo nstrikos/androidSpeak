@@ -45,7 +45,7 @@ double TextToSpeech::pitch() const
 
 void TextToSpeech::setPitch(double pitch)
 {
-    m_pitch = pitch / 100.0;
+    m_pitch = pitch;// / 100.0;
     m_speech->setPitch(m_pitch);
 }
 
@@ -56,7 +56,7 @@ double TextToSpeech::rate() const
 
 void TextToSpeech::setRate(double rate)
 {
-    m_rate = rate / 100.0;
+    m_rate = rate;// / 100.0;
     m_speech->setRate(m_rate);
 }
 

@@ -66,6 +66,10 @@ private slots:
     void disconnectServer();
 
     void setupOrca();
+    void incRate();
+    void decRate();
+    void incPitch();
+    void decPitch();
 
 private:
     Ui::MainWindow *ui;
@@ -74,6 +78,10 @@ private:
     QAction *showAction;
     QAction *quitAction;
     QAction *setupOrcaAction;
+    QAction *incRateAction;
+    QAction *decRateAction;
+    QAction *incPitchAction;
+    QAction *decPitchAction;
     QMenu *trayIconMenu;
 
     void activate();
@@ -126,6 +134,9 @@ private:
     QString m_activateKey;
     bool m_activateCtrl;
     bool m_activateAlt;
+    double m_rate;
+    double m_pitch;
+
 
     void setKeys();
 

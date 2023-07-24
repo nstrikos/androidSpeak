@@ -27,6 +27,16 @@ void Chat::appendMessage(const QString &from, const QString &message)
             m_speaking = true;
 
         m_textToSpeech.speak(m_text);
+    } else if (message.startsWith("command-rate:")) {
+        QString cmd = "command-rate:";
+        int length = cmd.length();
+        QString rate = message.right(message.length() - length);
+        m_textToSpeech.setRate(rate.toDouble());
+    } else if (message.startsWith("command-pitch:")) {
+        QString cmd = "command-pitch:";
+        int length = cmd.length();
+        QString pitch = message.right(message.length() - length);
+        m_textToSpeech.setPitch(pitch.toDouble());
     }
 }
 

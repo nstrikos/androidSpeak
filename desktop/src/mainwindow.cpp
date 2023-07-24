@@ -131,6 +131,10 @@ MainWindow::~MainWindow()
     delete quitAction;
     delete setupOrcaAction;
     delete trayIconMenu;
+    delete incRateAction;
+    delete decRateAction;
+    delete incPitchAction;
+    delete decPitchAction;
     delete trayIcon;
     delete fileMenu;
     delete ui;
@@ -151,6 +155,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::clientConnected()
 {
     connected = true;
+    emit sendText("command-rate:" + QString::number(m_rate));
+    emit sendText("command-pitch:" + QString::number(m_pitch));
     enableControls();
 }
 
@@ -363,6 +369,14 @@ void MainWindow::createMenu()
     optionsDialogAction = new QAction(tr("Application options..."), this);
     showFontSettingsDialogAction = new QAction(tr("Font settings..."), this);
     showFontSettingsDialogAction->setShortcut(tr("Ctrl+F"));
+    incRateAction = new QAction(tr("Increase rate"), this);
+    incRateAction->setShortcut(tr("F8"));
+    decRateAction = new QAction(tr("Decrease rate"), this);
+    decRateAction->setShortcut(tr("F7"));
+    incPitchAction = new QAction(tr("Increase pitch"), this);
+    incPitchAction->setShortcut(tr("F4"));
+    decPitchAction = new QAction(tr("Decrease pitch"), this);
+    decPitchAction->setShortcut(tr("F3"));
     setupOrcaAction = new QAction(tr("Setup orca"), this);
     setupOrcaAction->setShortcut(tr("Ctrl+Shift+O"));
 
@@ -370,12 +384,20 @@ void MainWindow::createMenu()
     connect(showShortcutAction, &QAction::triggered, this, &MainWindow::showShortcutDialog);
     connect(optionsDialogAction, &QAction::triggered, this, &MainWindow::showOptionsDialog);
     connect(showFontSettingsDialogAction, SIGNAL(triggered()), this, SLOT(showFontSettingsDialog()));
+    connect(incRateAction, SIGNAL(triggered()), this, SLOT(incRate()));
+    connect(decRateAction, SIGNAL(triggered()), this, SLOT(decRate()));
+    connect(incPitchAction, SIGNAL(triggered()), this, SLOT(incPitch()));
+    connect(decPitchAction, SIGNAL(triggered()), this, SLOT(decPitch()));
     connect(setupOrcaAction, &QAction::triggered, this, &MainWindow::setupOrca);
 
     fileMenu = menuBar()->addMenu(tr("Options"));
     fileMenu->addAction(showShortcutAction);
     fileMenu->addAction(optionsDialogAction);
     fileMenu->addAction(showFontSettingsDialogAction);
+    fileMenu->addAction(incRateAction);
+    fileMenu->addAction(decRateAction);
+    fileMenu->addAction(incPitchAction);
+    fileMenu->addAction(decPitchAction);
     fileMenu->addAction(setupOrcaAction);
 }
 
@@ -390,6 +412,8 @@ void MainWindow::readSettings()
     m_closeOnSystemTray = settings.value("systemTray", false).toBool();
     m_startMinimized = settings.value("minimized", false).toBool();
     m_useClipboard = settings.value("useClipboard", false).toBool();
+    m_rate = settings.value("rate", 0.0).toDouble();
+    m_pitch = settings.value("pitch", 0.0).toDouble();
 
     appFontFamily = settings.value("fontFamily").toString();
     appFontSize = settings.value("fontSize", 12).toInt();
@@ -518,6 +542,8 @@ void MainWindow::writeSettings()
     settings.setValue("activateKey", m_activateKey);
     settings.setValue("activateCtrl", m_activateCtrl);
     settings.setValue("activateAlt", m_activateAlt);
+    settings.setValue("rate", m_rate);
+    settings.setValue("pitch", m_pitch);
 }
 
 void MainWindow::setKeys()
@@ -640,6 +666,50 @@ void MainWindow::sendOkScreenReaderClient()
     }
 }
 
+void MainWindow::incRate()
+{
+    if (connected) {
+        m_rate += 0.1;
+        if (m_rate > 1.0)
+            m_rate = 1.0;
+        qDebug() << "Rate is: " << m_rate;
+        emit sendText("command-rate:" + QString::number(m_rate));
+    }
+}
+
+void MainWindow::decRate()
+{
+    if (connected) {
+        m_rate -= 0.1;
+        if (m_rate < -1.0)
+            m_rate = -1.0;
+        qDebug() << "Rate is: " << m_rate;
+        emit sendText("command-rate:" + QString::number(m_rate));
+    }
+}
+
+void MainWindow::incPitch()
+{
+    if (connected) {
+        m_pitch += 0.1;
+        if (m_pitch > 1.0)
+            m_pitch = 1.0;
+        qDebug() << "Pitch is: " << m_pitch;
+        emit sendText("command-pitch:" + QString::number(m_pitch));
+    }
+}
+
+void MainWindow::decPitch()
+{
+    if (connected) {
+        m_pitch -= 0.1;
+        if (m_pitch < -1.0)
+            m_pitch = -1.0;
+        qDebug() << "Pitch is: " << m_pitch;
+        emit sendText("command-pitch:" + QString::number(m_pitch));
+    }
+}
+
 void MainWindow::showFontSettingsDialog()
 {
     if (fontSettingsDialog == NULL)
@@ -743,15 +813,15 @@ void MainWindow::readServerMessage()
 
 
 
-                qDebug() << "Not connected - send command to client";
-                if (clientConnection != nullptr) {
-                    qDebug() << "clientConnection is active";
-                    clientConnection->write("not connected");
-                    clientConnection->flush();
-                    //clientConnection->deleteLater();
-                    //clientConnection = nullptr;
-                    //qDebug() << "Got here";
-                }
+            qDebug() << "Not connected - send command to client";
+            if (clientConnection != nullptr) {
+                qDebug() << "clientConnection is active";
+                clientConnection->write("not connected");
+                clientConnection->flush();
+                //clientConnection->deleteLater();
+                //clientConnection = nullptr;
+                //qDebug() << "Got here";
+            }
 
         }
     }
