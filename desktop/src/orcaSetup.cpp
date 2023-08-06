@@ -18,6 +18,13 @@ void OrcaSetup::start()
     setAutoStart();
 }
 
+void OrcaSetup::restore()
+{
+    restoreSpeechDispatcher();
+    restoreOrcaSettings();
+    removeAutoStart();
+}
+
 void OrcaSetup::setupSpeechDispatcher()
 {
     QString speechDispatcherDir = QDir::homePath() + "/.config/speech-dispatcher";
@@ -70,7 +77,7 @@ void OrcaSetup::copyPath(QString src, QString dst)
 void OrcaSetup::editSpeechDispatcher()
 {
     QString filename = QDir::homePath() + "/.config/speech-dispatcher/speechd.conf";
-    QString ext = ".androidSpeak-bak";
+    QString ext = ".bak";
 
     QFile::copy(filename, filename + ext);
 
@@ -157,4 +164,40 @@ void OrcaSetup::setAutoStart()
     }
 
     QFile::copy("/usr/share/applications/androidSpeak.desktop", dirName + "androidSpeak.desktop");
+}
+
+void OrcaSetup::restoreSpeechDispatcher()
+{
+    QString filename = QDir::homePath() + "/.config/speech-dispatcher/speechd.conf";
+    QString ext = ".bak";
+
+    if (QFile::exists(filename + ext)) {
+
+        QFile::remove(filename);
+
+        QFile::copy(filename + ext, filename);
+        QFile::remove(filename + ext);
+
+        QFile::remove(QDir::homePath() + "/.config/speech-dispatcher/modules/androidSpeak.conf");
+    } else {
+        QDir(QDir::homePath() + "/.config/speech-dispatcher/").removeRecursively();
+    }
+}
+
+void OrcaSetup::restoreOrcaSettings()
+{
+    QString filename = QDir::homePath() + "/.local/share/orca/user-settings.conf";
+
+    if (QFile::exists(filename + ".bak")) {
+        qDebug() << "Found orca backup file";
+        QFile::remove(filename);
+        QFile::copy(filename + ".bak", filename);
+        QFile::remove(filename + ".bak");
+    }
+}
+
+void OrcaSetup::removeAutoStart()
+{
+    QString dirName = QDir::homePath() + "/.config/autostart/androidSpeak.desktop";
+    QFile::remove(dirName);
 }

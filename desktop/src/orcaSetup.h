@@ -9,6 +9,7 @@ class OrcaSetup
 public:
     OrcaSetup();
     void start();
+    void restore();
 
 private:
     void setupSpeechDispatcher();
@@ -16,6 +17,9 @@ private:
     void editSpeechDispatcher();
     void editOrcaSettings();
     void setAutoStart();
+    void restoreSpeechDispatcher();
+    void restoreOrcaSettings();
+    void removeAutoStart();
 };
 
 #endif // ORCASETUP_H

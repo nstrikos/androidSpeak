@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    quitAction->setShortcut(tr("Ctrl+Q"));
 
     showAction = new QAction(tr("&Show"), this);
     connect(showAction, &QAction::triggered, this, &MainWindow::showWindow);
@@ -130,6 +131,7 @@ MainWindow::~MainWindow()
     delete showAction;
     delete quitAction;
     delete setupOrcaAction;
+    delete restoreOrcaAction;
     delete trayIconMenu;
     delete incRateAction;
     delete decRateAction;
@@ -137,6 +139,8 @@ MainWindow::~MainWindow()
     delete decPitchAction;
     delete trayIcon;
     delete fileMenu;
+    delete optionsMenu;
+    delete speechMenu;
     delete ui;
 }
 
@@ -370,16 +374,17 @@ void MainWindow::createMenu()
     showFontSettingsDialogAction = new QAction(tr("Font settings..."), this);
     showFontSettingsDialogAction->setShortcut(tr("Ctrl+F"));
     incRateAction = new QAction(tr("Increase rate"), this);
-    incRateAction->setShortcut(tr("F8"));
+    incRateAction->setShortcut(tr("F4"));
     decRateAction = new QAction(tr("Decrease rate"), this);
-    decRateAction->setShortcut(tr("F7"));
+    decRateAction->setShortcut(tr("F3"));
     incPitchAction = new QAction(tr("Increase pitch"), this);
-    incPitchAction->setShortcut(tr("F4"));
+    incPitchAction->setShortcut(tr("F8"));
     decPitchAction = new QAction(tr("Decrease pitch"), this);
-    decPitchAction->setShortcut(tr("F3"));
+    decPitchAction->setShortcut(tr("F7"));
     setupOrcaAction = new QAction(tr("Setup orca"), this);
     setupOrcaAction->setShortcut(tr("Ctrl+Shift+O"));
-
+    restoreOrcaAction = new QAction(tr("Restore orca settings"), this);
+    restoreOrcaAction->setShortcut(tr("Ctrl+Shift+R"));
 
     connect(showShortcutAction, &QAction::triggered, this, &MainWindow::showShortcutDialog);
     connect(optionsDialogAction, &QAction::triggered, this, &MainWindow::showOptionsDialog);
@@ -389,16 +394,23 @@ void MainWindow::createMenu()
     connect(incPitchAction, SIGNAL(triggered()), this, SLOT(incPitch()));
     connect(decPitchAction, SIGNAL(triggered()), this, SLOT(decPitch()));
     connect(setupOrcaAction, &QAction::triggered, this, &MainWindow::setupOrca);
+    connect(restoreOrcaAction, &QAction::triggered, this, &MainWindow::restoreOrca);
 
-    fileMenu = menuBar()->addMenu(tr("Options"));
-    fileMenu->addAction(showShortcutAction);
-    fileMenu->addAction(optionsDialogAction);
-    fileMenu->addAction(showFontSettingsDialogAction);
-    fileMenu->addAction(incRateAction);
-    fileMenu->addAction(decRateAction);
-    fileMenu->addAction(incPitchAction);
-    fileMenu->addAction(decPitchAction);
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    optionsMenu = menuBar()->addMenu(tr("Options"));
+    speechMenu = menuBar()->addMenu(tr("Speech"));
+
     fileMenu->addAction(setupOrcaAction);
+    fileMenu->addAction(restoreOrcaAction);
+    fileMenu->addAction(quitAction);
+
+    optionsMenu->addAction(showShortcutAction);
+    optionsMenu->addAction(optionsDialogAction);
+    optionsMenu->addAction(showFontSettingsDialogAction);
+    speechMenu->addAction(decRateAction);
+    speechMenu->addAction(incRateAction);
+    speechMenu->addAction(decPitchAction);
+    speechMenu->addAction(incPitchAction);
 }
 
 void MainWindow::readSettings()
@@ -774,6 +786,19 @@ void MainWindow::setupOrca()
     m_startMinimized = true;
     writeSettings();
     delete orcaSetup;
+}
+
+void MainWindow::restoreOrca()
+{
+    orcaSetup = new OrcaSetup();
+    orcaSetup->restore();
+    writeSettings();
+    delete orcaSetup;
+}
+
+void MainWindow::quit()
+{
+    QApplication::quit();
 }
 
 void MainWindow::handleServerConnection()

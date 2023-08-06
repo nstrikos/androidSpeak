@@ -66,6 +66,8 @@ private slots:
     void disconnectServer();
 
     void setupOrca();
+    void restoreOrca();
+    void quit();
     void incRate();
     void decRate();
     void incPitch();
@@ -78,6 +80,7 @@ private:
     QAction *showAction;
     QAction *quitAction;
     QAction *setupOrcaAction;
+    QAction *restoreOrcaAction;
     QAction *incRateAction;
     QAction *decRateAction;
     QAction *incPitchAction;
@@ -92,7 +95,9 @@ private:
     HotKeyThread *hotKeyThread;
     ShortcutWidget *shortcutWindow;
 
-    QMenu* fileMenu;
+    QMenu *fileMenu;
+    QMenu *optionsMenu;
+    QMenu *speechMenu;
 
     QAction* showShortcutAction;
     QAction* optionsDialogAction;
