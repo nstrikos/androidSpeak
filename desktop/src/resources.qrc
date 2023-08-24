@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/audio.png</file>
+        <file>resources/screenReaderSetup.wav</file>
+        <file>resources/screenReaderConfirmation.wav</file>
+        <file>resources/screenReaderRemoveConfirmation.wav</file>
     </qresource>
 </RCC>

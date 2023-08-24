@@ -7,6 +7,7 @@
 #include <QFontDatabase>
 #include <QFile>
 #include <QLocalSocket>
+#include <QProcess>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -82,12 +83,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(server, &QLocalServer::newConnection, this, &MainWindow::handleServerConnection);
     startServer();
     clientConnection = nullptr;
+
+    screenReaderDialog = nullptr;
 }
 
 void MainWindow::init()
 {
     if (!m_startMinimized) {
         show();
+        qDebug() << "show";
     }
     else {
         //showMinimized();
@@ -120,6 +124,9 @@ MainWindow::~MainWindow()
 
     if (fontSettingsDialog != nullptr)
         delete fontSettingsDialog;
+
+    if (screenReaderDialog != nullptr)
+        delete screenReaderDialog;
 
     delete optionsDialogAction;
     delete showShortcutAction;
@@ -162,6 +169,12 @@ void MainWindow::clientConnected()
     emit sendText("command-rate:" + QString::number(m_rate));
     emit sendText("command-pitch:" + QString::number(m_pitch));
     enableControls();
+
+    if (m_orcaSettingsInstalled) {
+        m_orcaSettingsInstalled = false;
+        writeSettings();
+        showOrcaConfirmDialog();
+    }
 }
 
 void MainWindow::clientDisconnected()
@@ -393,8 +406,8 @@ void MainWindow::createMenu()
     connect(decRateAction, SIGNAL(triggered()), this, SLOT(decRate()));
     connect(incPitchAction, SIGNAL(triggered()), this, SLOT(incPitch()));
     connect(decPitchAction, SIGNAL(triggered()), this, SLOT(decPitch()));
-    connect(setupOrcaAction, &QAction::triggered, this, &MainWindow::setupOrca);
-    connect(restoreOrcaAction, &QAction::triggered, this, &MainWindow::restoreOrca);
+    connect(setupOrcaAction, &QAction::triggered, this, &MainWindow::orcaSetupPressed);
+    connect(restoreOrcaAction, &QAction::triggered, this, &MainWindow::orcaRestorePressed);
 
     fileMenu = menuBar()->addMenu(tr("&File"));
     optionsMenu = menuBar()->addMenu(tr("Options"));
@@ -426,6 +439,7 @@ void MainWindow::readSettings()
     m_useClipboard = settings.value("useClipboard", false).toBool();
     m_rate = settings.value("rate", 0.0).toDouble();
     m_pitch = settings.value("pitch", 0.0).toDouble();
+    m_orcaSettingsInstalled = settings.value("orcaSettingsInstalled", false).toBool();
 
     appFontFamily = settings.value("fontFamily").toString();
     appFontSize = settings.value("fontSize", 12).toInt();
@@ -556,6 +570,7 @@ void MainWindow::writeSettings()
     settings.setValue("activateAlt", m_activateAlt);
     settings.setValue("rate", m_rate);
     settings.setValue("pitch", m_pitch);
+    settings.setValue("orcaSettingsInstalled", m_orcaSettingsInstalled);
 }
 
 void MainWindow::setKeys()
@@ -654,7 +669,7 @@ bool MainWindow::checkKeys()
                         QString ctrl = ctrl1 ? "true" : "false";
                         QString alt = alt1 ? "true" : "false";
                         doubleKeys += "Key " + key1 + " ctrl:" + ctrl + " alt:" + alt + " is assigned to phrases:\n" +
-                                      keys.at(i).phrase + " and\n" + keys.at(n).phrase + "\n";
+                                keys.at(i).phrase + " and\n" + keys.at(n).phrase + "\n";
                     }
                 }
             }
@@ -722,6 +737,83 @@ void MainWindow::decPitch()
     }
 }
 
+void MainWindow::orcaSetupPressed()
+{
+    if (screenReaderDialog == nullptr) {
+        QString text = "This will configure your orca screen reader and your speech dispatcher settings. After this the system will reboot.\nPress Y to continue or press N to return.";
+        QString audioFile = "qrc:/resources/screenReaderSetup.wav";
+        screenReaderDialog = new ScreenReaderDialog(text, audioFile, this);
+        connect(screenReaderDialog, &ScreenReaderDialog::yes, this, &MainWindow::setupScreenReader);
+        connect(screenReaderDialog, &ScreenReaderDialog::no, this, &MainWindow::closeScreenReaderDialog);
+    }
+
+    screenReaderDialog->start();
+}
+
+void MainWindow::orcaRestorePressed()
+{
+    if (screenReaderDialog == nullptr) {
+        QString text = "This will restore your screen reader settings and then will reboot the system.\nPress Y to continue or press N to return.";
+        QString audioFile = "qrc:/resources/screenReaderRemoveConfirmation.wav";
+        screenReaderDialog = new ScreenReaderDialog(text, audioFile, this);
+        connect(screenReaderDialog, &ScreenReaderDialog::yes, this, &MainWindow::restoreScreenReader);
+        connect(screenReaderDialog, &ScreenReaderDialog::no, this, &MainWindow::closeScreenReaderDialog);
+    }
+
+    screenReaderDialog->start();
+}
+
+void MainWindow::showOrcaConfirmDialog()
+{
+    if (screenReaderDialog == nullptr) {
+        QString text = "You updated your screen reader settings. Use tab to check your settings. If you want to keep your current settings press Y. If you want to reboot with your previous settings press N.";
+        QString audioFile = "qrc:/resources/screenReaderConfirmation.wav";
+        screenReaderDialog = new ScreenReaderDialog(text, audioFile, this);
+        connect(screenReaderDialog, &ScreenReaderDialog::yes, this, &MainWindow::closeScreenReaderDialog);
+        connect(screenReaderDialog, &ScreenReaderDialog::no, this, &MainWindow::restoreScreenReader);
+    }
+
+    screenReaderDialog->start();
+}
+
+void MainWindow::setupScreenReader()
+{
+    setupOrca();
+    reboot();
+}
+
+void MainWindow::restoreScreenReader()
+{
+    restoreOrca();
+    reboot();
+}
+
+void MainWindow::closeScreenReaderDialog()
+{
+    if (screenReaderDialog == nullptr)
+        return;
+
+    screenReaderDialog->stop();
+    screenReaderDialog->hide();
+    delete screenReaderDialog;
+    screenReaderDialog = nullptr;
+}
+
+void MainWindow::reboot()
+{
+    QProcess process;
+    QString program;
+    if (QFile::exists("/usr/bin/reboot"))
+        program = "/usr/bin/reboot";
+    else if (QFile::exists("/usr/sbin/reboot"))
+        program = "/usr/sbin/reboot";
+    else
+        program = "reboot";
+    process.startDetached(program, QStringList() << "");
+}
+
+
+
 void MainWindow::showFontSettingsDialog()
 {
     if (fontSettingsDialog == NULL)
@@ -754,6 +846,9 @@ void MainWindow::activatePressed()
     this->show();
     QWidget::activateWindow();
     ui->textEdit->setFocus();
+    //Set focus stealing prevention to none
+    //If you want to receive focus
+    this->setWindowState(Qt::WindowState::WindowActive);
 }
 
 void MainWindow::startServer()
@@ -775,7 +870,7 @@ void MainWindow::disconnectServer()
     if (clientConnection != nullptr)
         clientConnection->deleteLater();
     clientConnection = nullptr;
-    qDebug() << "Got here";
+    //qDebug() << "Got here";
 }
 
 void MainWindow::setupOrca()
@@ -784,6 +879,7 @@ void MainWindow::setupOrca()
     orcaSetup->start();
     m_closeOnSystemTray = true;
     m_startMinimized = true;
+    m_orcaSettingsInstalled = true;
     writeSettings();
     delete orcaSetup;
 }
@@ -868,5 +964,5 @@ void MainWindow::activate()
     cursor.setPosition(0);
     ui->historyEdit->setTextCursor(cursor);
     ui->historyEdit->insertPlainText(text + "\n");
-    ui->textEdit->setFocus();    
+    ui->textEdit->setFocus();
 }

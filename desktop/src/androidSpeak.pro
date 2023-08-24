@@ -1,4 +1,4 @@
-QT       += core gui
+QT += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,6 +22,7 @@ HEADERS       = \
                 orcaSetup.h \
                 peermanager.h \
                 screenReaderClient.h \
+                screenReaderDialog.h \
                 server.h \
                 shortcutWidget.h \
                 tripserver.h
@@ -41,6 +42,7 @@ SOURCES       = \
                 orcaSetup.cpp \
                 peermanager.cpp \
                 screenReaderClient.cpp \
+                screenReaderDialog.cpp \
                 server.cpp \
                 shortcutWidget.cpp \
                 tripserver.cpp
@@ -48,6 +50,7 @@ FORMS         = \
     fontsettingsdialog.ui \
     mainwindow.ui \
     optionsDialog.ui \
+    screenReaderDialog.ui \
     shortcutWidget.ui
 
 QT           += network widgets

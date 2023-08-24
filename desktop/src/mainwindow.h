@@ -10,6 +10,7 @@
 #include "optionsDialog.h"
 #include "fontsettingsdialog.h"
 #include "orcaSetup.h"
+#include "screenReaderDialog.h"
 #include <QClipboard>
 #include <QLocalServer>
 
@@ -65,13 +66,18 @@ private slots:
     void startServer();
     void disconnectServer();
 
-    void setupOrca();
-    void restoreOrca();
     void quit();
     void incRate();
     void decRate();
     void incPitch();
     void decPitch();
+
+    void orcaSetupPressed();
+    void orcaRestorePressed();
+
+    void closeScreenReaderDialog();
+    void restoreScreenReader();
+    void setupScreenReader();
 
 private:
     Ui::MainWindow *ui;
@@ -141,7 +147,7 @@ private:
     bool m_activateAlt;
     double m_rate;
     double m_pitch;
-
+    bool m_orcaSettingsInstalled;
 
     void setKeys();
 
@@ -156,6 +162,12 @@ private:
     void sendOkScreenReaderClient();
 
     OrcaSetup *orcaSetup;
+    void setupOrca();
+    void restoreOrca();
+    void showOrcaConfirmDialog();
+
+    ScreenReaderDialog *screenReaderDialog;
+    void reboot();
 };
 
 #endif // MAINWINDOW_H

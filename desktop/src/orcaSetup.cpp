@@ -103,7 +103,7 @@ void OrcaSetup::editSpeechDispatcher()
 
     if (n != -1) {
         i = n - 1;
-        if (text.at(i) != "#")
+        if (text.at(i) != QChar('#'))
         {
             text = text.insert(n+1, "#");
         }
