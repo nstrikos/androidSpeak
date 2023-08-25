@@ -1,6 +1,6 @@
-rm -rf ~/projects/$1
-cd ~/projects
-git clone https://github.com/nstrikos/$1.git
+#rm -rf ~/projects/$1
+#cd ~/projects
+#git clone https://github.com/nstrikos/$1.git
 rm -rf ~/builds/$1
 mkdir ~/builds/$1
 cd ~/builds/$1

@@ -8,6 +8,7 @@ libQt5Gui.so
 libQt5Network.so
 libQt5Widgets.so
 libQt5XcbQpa.so
+libQt5Opengl
 libQt5Multimedia
 libQt5MultimediaGstTools
 libQt5MultimediaWidgets
