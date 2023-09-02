@@ -31,7 +31,10 @@ void OrcaSetup::setupSpeechDispatcher()
 
     if (QDir(speechDispatcherDir).exists()) {
         qDebug() << "speech dispatcher directory exists";
-        //editSpeechDispatcher();
+        QString filename = QDir::homePath() + "/.config/speech-dispatcher/speechd.conf";
+        QString ext = ".bak";
+
+        QFile::copy(filename, filename + ext);
 
     } else {
         qDebug() << "Speech dispatcher directory does not exist." << speechDispatcherDir;
@@ -76,14 +79,9 @@ void OrcaSetup::copyPath(QString src, QString dst)
 
 void OrcaSetup::editSpeechDispatcher()
 {
-    QString filename = QDir::homePath() + "/.config/speech-dispatcher/speechd.conf";
-    QString ext = ".bak";
+    QString filename = QDir::homePath() + "/.config/speech-dispatcher/speechd.conf";   
 
-    QFile::copy(filename, filename + ext);
-
-    QFile::remove(filename);
-
-    QFile file(filename + ext);
+    QFile file(filename);
     QString text;
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
         QTextStream stream(&file);
@@ -115,6 +113,8 @@ void OrcaSetup::editSpeechDispatcher()
         text = text.insert(i, "\nDefaultModule androidSpeak\n");
     }
 
+    QFile::remove(filename);
+
     QFile dst(filename);
     if (dst.open(QIODevice::WriteOnly | QIODevice::Text)){
         QTextStream stream(&dst);
@@ -139,13 +139,19 @@ void OrcaSetup::editOrcaSettings()
     }
     file.close();
 
-    int n = text.indexOf("\"speechServerInfo");
-    int i = text.indexOf(",", n);
-    QString line = text.mid(n, i - n);
-    qDebug() << n << i << line;
+    int a = text.indexOf("profiles");
+    int b = text.indexOf("default", a);
 
-    text = text.remove(n, i-n);
-    text = text.insert(n, "\"speechServerInfo\": [\"androidSpeak\", \"androidSpeak\" ]");
+    int c = text.indexOf("\"speechServerInfo\"", b);
+
+    if (c == -1) {
+        int d = text.indexOf("{", b);
+        text = text.insert(d + 1, "\"speechServerFactory\": \"orca.speechdispatcherfactory\",\n\"speechServerInfo\": [\"androidSpeak\", \"androidSpeak\"],");
+    } else {
+        int d = text.indexOf("],", c);
+        text = text.remove(c, d - c + 2);
+        text = text.insert(c, "\"speechServerInfo\": [\"androidSpeak\", \"androidSpeak\"],");
+    }
 
     QFile dst(filename);
     if (dst.open(QIODevice::WriteOnly | QIODevice::Text)){
