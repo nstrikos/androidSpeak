@@ -11,10 +11,24 @@ ScreenReaderDialog::ScreenReaderDialog(QString text, QString audioFile, QWidget 
     player = nullptr;
     timer = nullptr;
     ui->textEdit->setText(text);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    audioOutput = nullptr;
+#endif
 }
 
 ScreenReaderDialog::~ScreenReaderDialog()
 {
+    if (player != nullptr)
+        delete player;
+    if (timer != nullptr)
+        delete timer;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (audioOutput != nullptr)
+        delete audioOutput;
+#endif
+
     delete ui;
 }
 
@@ -41,14 +55,10 @@ void ScreenReaderDialog::stop()
 
 void ScreenReaderDialog::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_Y) {
-        //this->accept();
-        emit yes();
-    }
-    else if (e->key() == Qt::Key_N) {
-        //this->reject();
-        emit no();
-    }
+    if (e->key() == Qt::Key_Y)
+        emit yes();    
+    else if (e->key() == Qt::Key_N)
+        emit no();    
 }
 
 void ScreenReaderDialog::playSound()
@@ -56,6 +66,14 @@ void ScreenReaderDialog::playSound()
     if (player == nullptr)
         player = new QMediaPlayer;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (audioOutput == nullptr)
+        audioOutput = new QAudioOutput;
+    player->setAudioOutput(audioOutput);
+    player->setSource(QUrl(audioFile));
+    player->play();
+#else
     player->setMedia(QUrl(audioFile));
     player->play();
+#endif
 }

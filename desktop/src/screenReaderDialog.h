@@ -6,6 +6,11 @@
 #include <QTimer>
 #include <QKeyEvent>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioOutput>
+#endif
+
+
 namespace Ui {
 class ScreenReaderDialog;
 }
@@ -35,6 +40,9 @@ private:
     QMediaPlayer *player;
     QTimer *timer;
     QString audioFile;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QAudioOutput *audioOutput;
+#endif
 };
 
 #endif // SCREENREADERDIALOG_H
